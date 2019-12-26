@@ -57,3 +57,35 @@ missingVec <- c(1,2,3,NA,NaN,5)
 is.na(missingVec)
 
 #Data frames and Name attribute 
+xname <- c(1:3)
+names(xname) <- c("Apple","Mango","Orange")
+xname
+
+#Load a csv file into a dataframe
+dataCars <- read.csv("Data/cars.csv")
+dataCars
+
+#Using interfaces to read different data types from urls to files
+con <- file("Data/cars.csv",r)
+dataCars <- read.csv(con)
+close(con)
+
+con1 <- url("https://www.facebook.com")
+websiteLines <- readLines(con1,30)
+websiteLines
+close(con1)
+
+#Subsetting lists
+subsetC <- c("a","b","b","c",NA)
+u <- subsetC > "a"
+u
+subsetC[u]
+
+u1 <- is.na(subsetC)
+u1
+subsetC[!u1]
+
+# applying this subset techinque to get mask for the Cars.csv
+notNA <- is.na(dataCars)
+dataCars
+dataCars[!notNA]
