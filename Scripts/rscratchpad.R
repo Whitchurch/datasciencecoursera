@@ -36,6 +36,24 @@ mat3 <- rbind(row1,row2)
 dim(mat3)
 mat3
 
+# factors
+factordemo <- factor(c("Yes","No","No","Yes"))
+factordemo
+table(factordemo)
 
+factorunclassed <- unclass(factordemo)
+factorunclassed
 
+#explicity set which level is associated with what
+factordemo1 <- factor(c("Yes","No","No","Yes"), levels = c("Yes","No"))
+factordemo1
+table(factordemo1)
 
+factorunclassed1 <- unclass(factordemo1)
+factorunclassed1
+
+#dealing with missing values
+missingVec <- c(1,2,3,NA,NaN,5)
+is.na(missingVec)
+
+#Data frames and Name attribute 
