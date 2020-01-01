@@ -87,5 +87,8 @@ subsetC[!u1]
 
 # applying this subset techinque to get mask for the Cars.csv
 notNA <- is.na(dataCars)
+notNA
 dataCars
 dataCars[!notNA]
+good <- complete.cases(dataCars)
+good
