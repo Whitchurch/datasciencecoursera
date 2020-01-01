@@ -92,3 +92,35 @@ dataCars
 dataCars[!notNA]
 good <- complete.cases(dataCars)
 good
+
+x<- 4
+class(x)
+
+x1 <- c(4,TRUE)
+class(x1)
+
+x <- c(1,3,5)
+y <- c(3,2,10)
+
+result <- cbind(x,y)
+
+result
+dim(result)
+
+x <- list(2,"abc","b",TRUE)
+x[[1]]
+class(x)
+
+x <- 1:4
+x
+y <- 2:3
+y
+
+result <- x+y 
+result
+class(result)
+
+x <- c(3,5,1,10,12,6)
+x[x %in% 1:5] <- 0
+x
+
