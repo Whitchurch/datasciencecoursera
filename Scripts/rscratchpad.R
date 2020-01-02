@@ -124,3 +124,62 @@ x <- c(3,5,1,10,12,6)
 x[x %in% 1:5] <- 0
 x
 
+cube <- function(x,n){
+  x^3
+}
+
+cube(3)
+
+x <- 1:10
+if(x > 5)
+{
+  x <- 0
+}
+
+f <- function(x)
+{
+  g <- function(y)
+  {
+    y+z
+  }
+    z <-4
+    x+g(x)
+  
+}
+
+z <- 10
+f(3)
+
+x <- 5
+y <- if(x < 3)
+{
+  NA
+}else
+{
+  10
+}
+y
+
+
+func1 <- function(x)
+{
+  
+  func2 <- function(y)
+  {
+    ZZ <- (y + 3 * x)
+    
+    func3 <- function(ZZ)
+    {
+      Z <- 10
+      ZZ <- ZZ*Z
+      ZZ
+    }
+    
+  }
+  
+  
+  func2(4)
+  
+}
+
+func1(10)
