@@ -68,5 +68,7 @@ meanValue <- mean(accumulator,na.rm = TRUE)
 print(round(meanValue,digits = 3)) #rounding the value to 3
 
 }
-id <- 1:10
-pollutantmean(directoryPath,"sulfate",id)
+
+pollutantmean(directoryPath,"sulfate",1:10)
+pollutantmean(directoryPath, "nitrate", 70:72)
+pollutantmean(directoryPath, "nitrate", 23)
