@@ -65,8 +65,8 @@ pollutantmean <- function(directory,pollutant= "sulfate",id = 1:332)
   
 # Calculate and spit out the mean of the accumulator vector
 meanValue <- mean(accumulator,na.rm = TRUE)
-print(meanValue)
+print(round(meanValue,digits = 3)) #rounding the value to 3
 
 }
-id <- 20
+id <- 1:10
 pollutantmean(directoryPath,"sulfate",id)
