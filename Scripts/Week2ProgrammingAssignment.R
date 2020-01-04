@@ -203,8 +203,9 @@ corr <- function(directory,threshold = 0)
     }
   }
   
-  print(head(storeCorResults))
-  print(summary(storeCorResults))
+  storeCorResults
+  #print(head(storeCorResults))
+  #print(summary(storeCorResults))
   # startindex <- 1
   # stopindex <- 1
   # dataframeCountValue <- complete1(directory = directory,stopindex)
@@ -243,3 +244,41 @@ corr <- function(directory,threshold = 0)
 
 corr(directoryPath)
 
+#Quiz questions to be processed
+pollutantmean(directoryPath, "sulfate", 1:10)
+pollutantmean(directoryPath, "nitrate", 70:72)
+pollutantmean(directoryPath, "sulfate", 34)
+pollutantmean(directoryPath, "nitrate")
+
+cc <- complete(directoryPath, c(6, 10, 20, 34, 100, 200, 310))
+print(cc$nobs)
+
+cc <- complete(directoryPath, 54)
+print(cc$nobs)
+
+RNGversion("3.5.1")  
+set.seed(42)
+cc <- complete(directoryPath, 332:1)
+use <- sample(332, 10)
+print(cc[use, "nobscount"])
+
+cr <- corr(directoryPath)                
+cr <- sort(cr)   
+RNGversion("3.5.1")
+set.seed(868)                
+out <- round(cr[sample(length(cr), 5)], 4)
+print(out)
+
+cr <- corr(directoryPath, 129)                
+cr <- sort(cr)                
+n <- length(cr)    
+RNGversion("3.5.1")
+set.seed(197)                
+out <- c(n, round(cr[sample(n, 5)], 4))
+print(out)
+
+cr <- corr(directoryPath, 2000)                
+n <- length(cr)                
+cr <- corr(directoryPath, 1000)                
+cr <- sort(cr)
+print(c(n, round(cr, 4)))
