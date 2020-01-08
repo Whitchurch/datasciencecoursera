@@ -1,3 +1,7 @@
+#clear the environment before executing code:
+remove(list = ls())
+
+
 ## Put comments here that give an overall description of what your
 ## functions do
 
@@ -49,119 +53,144 @@
      
    }
    
+   processCache <- function(matrixtoprocess = matrix())
+   {
+     #Check if the matrix is invertible or singular
+     if(det(matrixtoProcess) == 0)
+     {
+       print("The matrix is singular, and has no inverse")
+       
+     }
+     else   
+     {
+       print("1:Calculating the inverse of the matrix")
+       x$setInverseMatrix(solve(matrixtoProcess))
+       setCornerCaseStateSaverMatrix(x$getInverseMatrix())
+       setMatrix(matrixtoProcess)
+       x$getInverseMatrix()
+     }  
+   }
+   
    matrixtoProcess <- x$getMatrix()   # Set the matrix to ptocess
    oldmatrixProcessed <- getOldMatrix() # Get old matrix
    
    
-   #If there is no old matrix that was processed
+   #If there is no old matrix that was processed in the past
    # perform the inverse calculation
    if(is.null(oldmatrixProcessed)) 
    {
      
-           #Check if the matrix is invertible or singular
-           if(det(matrixtoProcess) == 0)
-           {
-             print("The matrix is singular, and has no inverse")
-    
-           }
-           else   
-           {
-             print("1:Calculating the inverse of the matrix")
-             x$setInverseMatrix(solve(matrixtoProcess))
-             setCornerCaseStateSaverMatrix(x$getInverseMatrix())
-             setMatrix(matrixtoProcess)
-           }
+      processCache(matrixtoProcess)
      
-    
    }
    #If old matrix was already present, check if the new matrix and old matrix are the same, if not
    # recalculate a new inverse
-   else
+   else #Step1: check if rows and coulmns are same or different
    {
      if(nrow(matrixtoProcess) != nrow(oldmatrixProcessed))
      {
        print("The matrix has changed")
-       print("2:Calculating the inverse of the matrix")
-       #Check if the matrix is invertible or singular
-       if(det(matrixtoProcess) == 0)
-       {
-         print("The matrix is singular, and has no inverse")
-      
-       }
-       else   
-       {
-         print("1:Calculating the inverse of the matrix")
-         x$setInverseMatrix(solve(matrixtoProcess))
-         setCornerCaseStateSaverMatrix(x$getInverseMatrix())
-         setMatrix(matrixtoProcess)
-       }
+       print("Calculating the inverse of the matrix")
+       processCache(matrixtoProcess)
      }
      else if(ncol(matrixtoProcess)!=ncol(oldmatrixProcessed))
      {
        print("The matrix has changed")
-       print("3:Calculating the inverse of the matrix")
-       #Check if the matrix is invertible or singular
-       if(det(matrixtoProcess) == 0)
-       {
-         print("The matrix is singular, and has no inverse")
-       }
-       else   
-       {
-         print("1:Calculating the inverse of the matrix")
-         x$setInverseMatrix(solve(matrixtoProcess))
-         setCornerCaseStateSaverMatrix(x$getInverseMatrix())
-         setMatrix(matrixtoProcess)
-       }    
+       print("Calculating the inverse of the matrix")
+       processCache(matrixtoProcess)    
      }
-     else
+     else #Step2: Check if contents of the both matrices are the same
      {
        matdiff <- sum(as.integer(matrixtoProcess==oldmatrixProcessed))
        if(matdiff == nrow(matrixtoProcess)*ncol(matrixtoProcess))
        {
          print("The matrices are equal; retrieving inverse from the Cache")
-         if(is.null(x$getInverseMatrix()))
+         if(is.null(x$getInverseMatrix())) #Corner case: intializing the same object twice in a row, with same content.
          {
-           print("Corner case: retiriving from the Central Cache: which is good Caching design")
-           print(cornercaseCacheStateSaver)
+           #print("Corner case: retiriving from the Central Cache: which is good Caching design")
+           #print(cornercaseCacheStateSaver)
            x$setInverseMatrix(cornercaseCacheStateSaver)
          }
-         else
+         else #Step3: As long as the dimensions and the contents of both matrices match, fetch from the cache
          {
-           print("Normal Caching scenario as per assignment - retrieveing from object as assignmern requires: which is bad Caching design")
-           print(x$getInverseMatrix())    
+           #print("Normal Caching scenario as per assignment - retrieveing from object as assignmern requires: which is bad Caching design")
+           #print(x$getInverseMatrix())    
          }
          
        }
        else
        {
          print("The matrix has changed")
-         print("4:Calculating the inverse of the matrix")
-         #Check if the matrix is invertible or singular
-         if(det(matrixtoProcess) == 0)
-         {
-           print("The matrix is singular, and has no inverse")
-         }
-         else   
-         {
-           print("1:Calculating the inverse of the matrix")
-           x$setInverseMatrix(solve(matrixtoProcess))
-           setCornerCaseStateSaverMatrix(x$getInverseMatrix())
-           setMatrix(matrixtoProcess)
-         }
+         print("Calculating the inverse of the matrix")
+         processCache(matrixtoProcess)
        }   
      }
 
      
    }
    #Return a matrix that is the inverse of 'x'
-   
+   x$getInverseMatrix()
  }
+ 
+ 
+ 
+ 
+ #Test Bench for the Caching code:
+ 
+ #Scenario 1: Initializing an object for the very first time
+ mat1 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat1)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+
+ #Scenario 2: Passing in the same object to exercise caching capability
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+ #Scenario 3: Passing in a new matrix vector to check, if Caching logic recognizes the change
+ 
+ mat2 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = FALSE)
+ resultmatrix <- makeCacheMatrix(mat2)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+ #Scenario 4: changing the dimensions and values of the matrix, to check if Caching logic recognizes the change
+ # Also passing in a singular matrix, to check if the code can handle such a case
+ mat2 <- matrix(2:17,4,4)
+ resultmatrix2 <- makeCacheMatrix(mat2)
+ cacheVar <- cacheSolve(resultmatrix2)
+ 
+ #Scenario 5: Re-initiazing and passing in the same object again and again, to check if the Cache is optimized to handle
+ # such a scenario
  
  mat1 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
  resultmatrix <- makeCacheMatrix(mat1)
  cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
  
- mat2 <- matrix(2:17,4,4)
- resultmatrix2 <- makeCacheMatrix(mat2)
- cacheSolve(resultmatrix2)
+ mat1 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat1)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+ mat1 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat1)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
 
+ #scenario 6: Passing in the same matrix via different objects to see , if caching still optimizes that scenario
+ mat1 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat1)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+ mat2 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat2)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
+ 
+ mat3 <- matrix(c(1,0,4,1,3,4,4,1,0),3,3,byrow = TRUE)
+ resultmatrix <- makeCacheMatrix(mat3)
+ cacheVar <- cacheSolve(resultmatrix)
+ print(cacheVar)
