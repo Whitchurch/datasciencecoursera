@@ -183,3 +183,43 @@ func1 <- function(x)
 }
 
 func1(10)
+
+# # Scratch pad of how caching is done with vectors:-
+#
+# #The code below is the create an object wiht 4 list items (set,get,setmean,getmean) basically
+# # Setters and Getters for the object, as well as getters and setters for the mean value
+# makeVector <- function(x = numeric()) {
+#   m <- NULL
+#   set <- function(y) {
+#     x <<- y
+#     m <<- NULL
+#   }
+#   get <- function() x
+#   setmean <- function(mean) m <<- mean
+#   getmean <- function() m
+#   list(set = set, get = get,
+#        setmean = setmean,
+#        getmean = getmean)
+# }
+#
+# # This function takes in the makevector object and , checks if a cached mean value is present
+# # if so it returns that vale; else: it calculates the mean for the object. sets the mean for the
+# # object via the setmean setter before displaying the mean
+# cachemean <- function(x, ...) {
+#   m <- x$getmean()
+#   if(!is.null(m)) {
+#     message("getting cached data")
+#     return(m)
+#   }
+#   data <- x$get()
+#   m <- mean(data, ...)
+#   x$setmean(m)
+#   m
+# }
+#
+# vec1 <- c(1,2,3,4,5,6)
+# result <- makeVector(vec1)
+# result$get()
+# result$getmean()
+# class(result)
+# cachemean(result)
