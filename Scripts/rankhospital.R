@@ -1,6 +1,6 @@
 #Helper function to return: The best performing hospital in a state, based on a certain outcome criteria
 
-rankhospital <- function(state, outcome,rankValue)
+rankhospital <- function(state, outcome,rankValue = "best")
 {
   print("Inside the Best.R")
   
@@ -86,6 +86,8 @@ rankhospital <- function(state, outcome,rankValue)
     vecresult <- newdataframe[order(newdataframe$HA30,newdataframe$Hospital.Name),]
     vecRank <- rank(vecresult$HA30,ties.method = "first")
     vecresult$Rank <- vecRank
+    vecresultMask <- !is.na(vecresult$HA30)
+    vecresult <- vecresult[vecresultMask,]
     
     if(rankValue == "best")
     {
@@ -109,6 +111,8 @@ rankhospital <- function(state, outcome,rankValue)
     vecresult <- newdataframe[order(newdataframe$HF30,newdataframe$Hospital.Name),]
     vecRank <- rank(vecresult$HF30,ties.method = "first")
     vecresult$Rank <- vecRank
+    vecresultMask <- !is.na(vecresult$HF30)
+    vecresult <- vecresult[vecresultMask,]
     
     if(rankValue == "best")
     {
@@ -134,6 +138,8 @@ rankhospital <- function(state, outcome,rankValue)
     vecresult <- newdataframe[order(newdataframe$PN30,newdataframe$Hospital.Name),]
     vecRank <- rank(vecresult$PN30,ties.method = "first")
     vecresult$Rank <- vecRank
+    vecresultMask <- !is.na(vecresult$PN30)
+    vecresult <- vecresult[vecresultMask,]
     
     if(rankValue == "best")
     {
