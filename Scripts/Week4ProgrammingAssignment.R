@@ -47,4 +47,7 @@ setwd(directoryPath)
 #rankhospital(state = "TX",outcome = "heart failure",rankValue = "best")
 #rankhospital(state = "TX",outcome = "heart failure",rankValue = "worst")
 #rankhospital(state = "MD",outcome = "heart attack",rankValue = 5)
-
+source("rankall.R")
+head(rankall(outcome = "heart attack",20),10)
+tail(rankall("pneumonia","worst"),3)
+tail(rankall(outcome = "heart failure"),10)
