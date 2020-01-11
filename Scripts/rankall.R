@@ -94,7 +94,9 @@ rankall <- function(outcome,rankValue = "best")
         }
         else if(rankValue <= nrow(vecresult))
         {
-           vecresult[rankValue,c("State","Hospital.Name")]
+          vecresult[rankValue,]
+
+           
         }
         else
         {
@@ -128,7 +130,7 @@ rankall <- function(outcome,rankValue = "best")
       }
       else if(rankValue <= nrow(vecresult))
       {
-        vecresult[rankValue,"Hospital.Name"]
+        vecresult[rankValue,]
       }
       else
       {
@@ -164,7 +166,7 @@ rankall <- function(outcome,rankValue = "best")
       }
       else if(rankValue <= nrow(vecresult))
       {
-        vecresult[rankValue,"Hospital.Name"]
+        vecresult[rankValue,]
       }
       else
       {
