@@ -223,3 +223,59 @@ func1(10)
 # result$getmean()
 # class(result)
 # cachemean(result)
+
+
+#Course 3 Quiz 
+if(!file.exists("Downloadfiles"))
+{
+  dir.create("DownloadFiles")
+}
+
+
+if(file.exists("./DownloadFiles/uscommunities.csv"))
+{
+  print("the file exists")
+}else
+{
+  fileurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+  download.file(fileurl,destfile = "./DownloadFiles/uscommunities.csv", method = "curl")
+}
+
+datafile <- read.csv("./DownloadFiles/uscommunities.csv")
+summary(datafile)
+str(datafile)
+names(datafile)
+
+summary(datafile$VAL)
+str(datafile$VAL)
+print(datafile$VAL)
+
+maskMillion <- datafile$VAL == 24
+print(maskMillion)
+
+onlyMillionhomes <- datafile[maskMillion,"VAL"]
+print(onlyMillionhomes)
+
+removeNAs <- is.na(onlyMillionhomes)
+print(removeNAs)
+
+onlyMillionhomes <- onlyMillionhomes[!removeNAs]
+print(onlyMillionhomes)
+ncol(onlyMillionhomes)
+
+print(datafile$FES)
+str(datafile$FES)
+head(datafile$FES)
+
+if(file.exists("./DownloadFiles/naturalgasacquisitions.xslx"))
+{
+  print("the file exists")
+}else
+{
+  fileurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx"
+  download.file(fileurl,destfile = "./DownloadFiles/naturalgasacquisitions.xslx", method = "curl")
+}
+
+dat <- 
+
+
