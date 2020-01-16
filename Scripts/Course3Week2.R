@@ -43,3 +43,50 @@ print(jsoninfo$full_name)
 
 mask <- jsoninfo[jsoninfo$full_name == "jtleek/datasharing","created_at"]
 print(mask) # print the created_at value that has repo name as "jyleek/datasharing" 
+
+
+#Question 2: 
+if(file.exists("./DownloadFiles/Surveydata.csv"))
+{
+  print("the file exists")
+}else
+{
+  fileurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+  download.file(fileurl,destfile = "./DownloadFiles/Surveydata.csv", method = "curl")
+}
+
+install.packages("sqldf")
+library(sqldf)
+detach("package:RMySQL", unload=TRUE)
+acs <- read.csv("./DownloadFiles/Surveydata.csv")
+head(acs)
+
+sqldf("select pwgtp1 from acs where AGEP < 50")
+
+#Question(3)
+a1 <- unique(acs$AGEP)
+
+a2 <- sqldf("select distinct AGEP from acs")
+
+str(a1)
+str(a2)
+
+#Question 4 - Reading from a HTML page
+con <- url("http://biostat.jhsph.edu/~jleek/contact.html")
+htmlcode <- readLines(con)
+close(con)
+print(htmlcode)
+class(htmlcode)
+str(htmlcode)
+a<-htmlcode[10]
+b<- htmlcode[20]
+c <- htmlcode[30]
+d <- htmlcode[100]
+
+print(nchar(htmlcode[10]))
+print(nchar(htmlcode[20]))
+print(nchar(htmlcode[30]))
+print(nchar(htmlcode[100]))
+
+
+

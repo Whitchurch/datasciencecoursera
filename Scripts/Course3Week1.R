@@ -4,7 +4,6 @@ if(!file.exists("Downloadfiles"))
   dir.create("DownloadFiles")
 }
 
-
 if(file.exists("./DownloadFiles/uscommunities.csv"))
 {
   print("the file exists")
