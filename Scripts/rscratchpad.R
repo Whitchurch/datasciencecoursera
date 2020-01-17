@@ -224,4 +224,23 @@ func1(10)
 # class(result)
 # cachemean(result)
 
+# Interesting R commaonds that I have not used:
+#any <- use this to check if there are na NAs, present
+#ColSums() use this to sum over all columns to see if NAs are present
+# which <- use this with conditionals to ignore nas while performing logical operations
+# table(df$something %in% c("1234")) <- use this to check for specific values inside the columns
+# Xtabs() <- cross tabs to identify relationships
+# ftable()
+# seq <- creating sequnces
+# cut , used to break up data into quantiles, 
+library(reshape2)
+head(mtcars)
+carMElt <- melt(mtcars, id= c("gear","cyl"), measure.vars = c("mpg","hp"))
+head(carMElt)
+summary(carMElt)
+print(carMElt)
 
+cylData <- xtab(cylData$cyl ~.)
+
+chicago <- readRDS("chicago.rds")
+str(chicago)
