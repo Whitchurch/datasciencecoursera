@@ -17,8 +17,9 @@ head(dataFrameCSV, n = 2)
 agricultureLogical <- (dataFrameCSV$ACR == 3 & dataFrameCSV$AGS == 6)
 which(agricultureLogical)
 
+
 #Question -2
 install.packages("jpeg")
 library(jpeg)
 
-jpegInfo <- readJPEG("https://d396qusza40orc.cloudfront.net/getdata%2Fjeff.jpg",native = TRUE)
+jpegInfo <- readJPEG(url("https://d396qusza40orc.cloudfront.net/getdata%2Fjeff.jpg"),native = TRUE)
