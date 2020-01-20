@@ -245,3 +245,4 @@ cylData <- xtab(cylData$cyl ~.)
 chicago <- readRDS("chicago.rds")
 str(chicago)
 filter(cran, size > 100500 & (na.omit(r_os == "linux_gnu")))
+
