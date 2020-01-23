@@ -96,7 +96,25 @@ TestDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 = 
 #Step 4: Create the Merged Data Set; Merging Training and Test Datasets
 MergedDataSet <- rbind(TrainDataSet,TestDataSet)
 
-#Step5: Coming soon...
+#Step5: Extract the mean and SD columns:-
+str(v1 <- grep("std|mean",names(MergedDataSet)))
+ColumnsToSelect <- names(MergedDataSet[v1])
+ColumnsToSelect <- append(ColumnsToSelect,c("volunteer_id","activities"),after = 0)
+
+#Note I have conscioulsy included MeafFrequency, as it calculates Mean of Frequencies, and qualifies as a Mean, albeit indirectly.
+str(ColumnsToSelect)
+duplicated(ColumnsToSelect)
+
+#There seem to be some duplicate columns with the same name that is causing dplyr select to fail:-
+duplicateColumnMask <- duplicated(names(MergedDataSet))
+sum(as.integer(duplicateColumnMask)) #84 duplicates
+
+v2 <- grep("std|mean",(names(MergedDataSet[duplicated(names(MergedDataSet))])))
+ColumnsToSelectV2 <- names(MergedDataSet[v2]) # returns 0, This means none of the duplicated columns are of interest to us
+
+#Therefore instead of wrangling the data further, I take only the columns of interest, ignore the rest.
+MergedDataSet <- MergedDataSet[,ColumnsToSelect]
+str(MergedDataSet)
 
 #Step6: Use descriptive activity name for activities in the dataset
 MergedDataSet$activities
@@ -108,16 +126,21 @@ activityDF <- activityDF%>%rename("activity" = "V2")
 head(MergedDataSet$activities)
 head(activityDF)
 
+#res <- vector(mode="character",length = length(MergedDataSet$activities))
 
-for(X in MergedDataSet$activities)
+for(X in activityDF$activity_id)
 {
   if(grep(X,activityDF$activity_id))
   {
-    gsub(X,activityDF[X,"activity"],X)
+    #print(X)
+    #print(as.character(activityDF[X,"activity"]))
+    MergedDataSet$activities <- gsub(X,as.character(activityDF[X,"activity"]),MergedDataSet$activities)
+   
     
   }
 }
 
+names(MergedDataSet)
 
-
+#Step 7: Give more descriptive names for the variables so non-domain experts understand it
 
