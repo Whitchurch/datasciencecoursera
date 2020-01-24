@@ -143,4 +143,23 @@ for(X in activityDF$activity_id)
 names(MergedDataSet)
 
 #Step 7: Give more descriptive names for the variables so non-domain experts understand it
+names(MergedDataSet) <- gsub("-","",names(MergedDataSet))
+names(MergedDataSet) <- gsub("X$","_AlongXAxis",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Y$","_AlongYAxis",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Z$","_AlongZAxis",names(MergedDataSet))
+names(MergedDataSet) <- gsub("std()","_StandardDeviation",names(MergedDataSet))
+names(MergedDataSet) <- gsub("meanFreq()","_Meanfrequency",names(MergedDataSet))
+names(MergedDataSet) <- gsub("[()]","",names(MergedDataSet))
+names(MergedDataSet) <- gsub("mean","_Mean",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Acc","Acceleration",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Mag","Magnitude",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Gyro","AngularVelocity",names(MergedDataSet))
+names(MergedDataSet) <- gsub("^t","Time_for_",names(MergedDataSet))
+names(MergedDataSet) <- gsub("^f","Frequency_for_",names(MergedDataSet))
+names(MergedDataSet) <- gsub("Jerk","JerkSignal",names(MergedDataSet))
+
+# I have grepped and used highly descriptive verbose variable names so all lay people can understand the meaning
+
+#Step 8: Creating the tidy dataset from the newly merged data set.
+
 
