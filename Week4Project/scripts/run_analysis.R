@@ -154,9 +154,12 @@ names(MergedDataSet) <- gsub("mean","_Mean",names(MergedDataSet))
 names(MergedDataSet) <- gsub("Acc","Acceleration",names(MergedDataSet))
 names(MergedDataSet) <- gsub("Mag","Magnitude",names(MergedDataSet))
 names(MergedDataSet) <- gsub("Gyro","AngularVelocity",names(MergedDataSet))
-names(MergedDataSet) <- gsub("^t","Time_for_",names(MergedDataSet))
-names(MergedDataSet) <- gsub("^f","Frequency_for_",names(MergedDataSet))
+names(MergedDataSet) <- gsub("^t","Time_of_",names(MergedDataSet))
+names(MergedDataSet) <- gsub("^f","Frequency_of_",names(MergedDataSet))
 names(MergedDataSet) <- gsub("Jerk","JerkSignal",names(MergedDataSet))
+names(MergedDataSet) <- gsub("BodyBody","Body",names(MergedDataSet))
+
+names(MergedDataSet)
 
 # I have grepped and used highly descriptive verbose variable names so all lay people can understand the meaning
 
