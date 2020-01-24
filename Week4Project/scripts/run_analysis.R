@@ -5,6 +5,7 @@ rm(list = ls())
 DataFrameCreator <- function(path1,path2,path3,features){
   
   library(dplyr)
+
   # ======================================Load the Training Data Set==================================#
   pathtolaad <- path1
   traininputDF <- read.csv(pathtolaad,header = FALSE,sep = "")
@@ -159,10 +160,29 @@ names(MergedDataSet) <- gsub("^f","Frequency_of_",names(MergedDataSet))
 names(MergedDataSet) <- gsub("Jerk","JerkSignal",names(MergedDataSet))
 names(MergedDataSet) <- gsub("BodyBody","Body",names(MergedDataSet))
 
-names(MergedDataSet)
-
 # I have grepped and used highly descriptive verbose variable names so all lay people can understand the meaning
 
-#Step 8: Creating the tidy dataset from the newly merged data set.
 
+#Step 8: Creating the tidy dataset 
+# We group by Volunteer_id ad activities.
+
+MergedDataSet <- group_by(MergedDataSet,volunteer_id)
+MergedDataSet <- group_by(MergedDataSet,activities,add = TRUE)
+
+
+#Now if we apply summarize_at, with means as the function to apply. it will summarize the columns of interest,
+#by breaking them into sections. The sections are demarcated by (Volunteer_id and Activity) which is what group_by
+#did for us.
+
+vec <- names(MergedDataSet)
+vec <- tail(vec,-2)
+str(vec)
+
+tidySet <- summarize_at(MergedDataSet,.vars = vec ,.funs = mean)
+
+
+#============================================Viewing the Tidy Data Set ==============================#
+View(tidySet)
+nrow(tidySet)
+ncol(tidySet)
 
