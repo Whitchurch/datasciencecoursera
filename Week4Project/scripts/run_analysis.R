@@ -71,25 +71,36 @@ DataFrameCreator <- function(path1,path2,path3,features){
   
   
 }
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
 
 #Step 2:
-# Create the Training Dataset
+# Create the Training Dataset by calling the function DataFrameCreator
 #Setup the correct paths:-
-pathtolaad1 <- "./Week4Project/data/dataset/train/X_train.txt"
-pathtolaad2 <- "./Week4Project/data/dataset/train/y_train.txt"
-pathtolaad3 <- "./Week4Project/data/dataset/train/subject_train.txt"
-featurestoload <- "./Week4Project/data/dataset/features.txt"
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
+pathtolaad1 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/X_train.txt",pathofinterest)
+pathtolaad2 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/y_train.txt",pathofinterest)
+pathtolaad3 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/subject_train.txt",pathofinterest)
+featurestoload <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
+#pathtolaad3 <- "./Week4Project/data/dataset/train/subject_train.txt"
+#pathtolaad1 <- "./Week4Project/data/dataset/train/X_train.txt"
+#pathtolaad2 <- "./Week4Project/data/dataset/train/y_train.txt"
+#featurestoload <- "./Week4Project/data/dataset/features.txt"
 
 #Call DataFrameCreator function to get the Trained Dataset 
 TrainDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 = pathtolaad3,features = featurestoload)
 
 
 #Step3:
-#Create the TEst Dataset
-pathtolaad1 <- "./Week4Project/data/dataset/test/X_test.txt"
-pathtolaad2 <- "./Week4Project/data/dataset/test/y_test.txt"
-pathtolaad3 <- "./Week4Project/data/dataset/test/subject_test.txt"
-featurestoload <- "./Week4Project/data/dataset/features.txt"
+#Create the Test Dataset by calling the function DataFrame creator
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
+pathtolaad1 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/X_test.txt",pathofinterest)
+pathtolaad2 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/y_test.txt",pathofinterest)
+pathtolaad3 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/subject_test.txt",pathofinterest)
+featurestoload <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
+#pathtolaad1 <- "./Week4Project/data/dataset/test/X_test.txt"
+#pathtolaad2 <- "./Week4Project/data/dataset/test/y_test.txt"
+#pathtolaad3 <- "./Week4Project/data/dataset/test/subject_test.txt"
+#featurestoload <- "./Week4Project/data/dataset/features.txt"
 
 #Call DataFrameCreator function to get the Trained Dataset 
 TestDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 = pathtolaad3,features = featurestoload)
@@ -119,7 +130,9 @@ str(MergedDataSet)
 
 #Step6: Use descriptive activity name for activities in the dataset
 MergedDataSet$activities
-pathtoload <- "./Week4Project/data/dataset/activity_labels.txt"
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
+pathtolaad <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/activity_labels.txt",pathofinterest)
+#pathtoload <- "./Week4Project/data/dataset/activity_labels.txt"
 activityDF <- read.csv(pathtoload,header = FALSE,sep=" ")
 activityDF <- activityDF%>%rename("activity_id" = "V1")
 activityDF <- activityDF%>%rename("activity" = "V2")
@@ -185,4 +198,11 @@ tidySet <- summarize_at(MergedDataSet,.vars = vec ,.funs = mean)
 View(tidySet)
 nrow(tidySet)
 ncol(tidySet)
+
+#========================Generating the required filed: tidydata.txt=====================#
+#Writing the tidyDataSet
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
+pathtolaad <- gsub("Week4Project/scripts/run_analysis.R","Week4Project/output/tidydata.txt",pathofinterest)
+write.csv(tidySet,pathtolaad,row.names = FALSE)
+
 
