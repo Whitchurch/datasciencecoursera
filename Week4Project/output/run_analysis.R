@@ -1,4 +1,4 @@
-#Step 0: Clear the environment variables 
+#Step 0: Clear the environment variables and loadup required packages
 
 rm(list = ls())
 
