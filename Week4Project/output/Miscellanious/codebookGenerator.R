@@ -134,6 +134,7 @@ validRange <- gsub("Time","10^9 accuracy in decimal",validRange)
 validRange <- gsub("Frequency","10^9 accuracy in decimal",validRange)
 
 VariableName <- columnNames
+VariableName <- cbind(VariableName,columnLocation)
 VariableName <- cbind(VariableName,columnUnits)
 VariableName <- cbind(VariableName,validRange)
 VariableName <- cbind(VariableName,columnDescription)
