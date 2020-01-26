@@ -139,7 +139,7 @@ VariableName <- cbind(VariableName,validRange)
 VariableName <- cbind(VariableName,columnDescription)
 
 
-result <- pandoc.table.return(dataframeToMarkdown,split.tables = Inf,style = "rmarkdown")
+result <- pandoc.table.return(VariableName,split.tables = Inf,style = "rmarkdown")
 class(result)
 
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
