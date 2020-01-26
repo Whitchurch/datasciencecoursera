@@ -63,7 +63,8 @@ The file generated is names: tidydata.txt.
 ```
 
 
-### Codebook file
+### Codebook file: codebook.md
+**Note: ** codebookGenerator.R is the .R script to generate the codebook.md
 This file contains the description of the variables, that make up the columns of the output tidy data set: tidydata.txt.
 It also contains the units for each of the variables as applicable
 It contains a description of the variables.
