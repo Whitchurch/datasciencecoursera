@@ -1,4 +1,10 @@
-
+# This is the CODEBOOK for the assignment
+## This is broken up into 4 columns:
+- VariableName: This is the name of the variable in the tidy data set
+- columnLocation: This specifies which column is occupied by the variable
+- ColumnUnits: This is the units for the variable
+- validRange: This is the permitted range of values in the variables
+- columnDescription: This gives an explanation of what the variables represent
 
 |                             VariableName                              | columnLocation | columnUnits |                                    validRange                                    |                                               columnDescription                                               |
 |:---------------------------------------------------------------------:|:--------------:|:-----------:|:--------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------:|
