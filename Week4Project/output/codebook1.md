@@ -354,3 +354,17 @@ Table: Table continues below
 |           The average frequency of  the  gyroscopic angular velocty  of the Jerk Signal  Magnitude            |
 |    The Standard deviation of frequency of  the  gyroscopic angular velocty  of the Jerk Signal  Magnitude     |
 |           The average frequency of  the  gyroscopic angular velocty  of the Jerk Signal  Magnitude            |
+=======
+|        &nbsp;         | mpg  | cyl | disp  | hp  | drat |
+|:---------------------:|:----:|:---:|:-----:|:---:|:----:|
+|     **Mazda RX4**     |  21  |  6  |  160  | 110 | 3.9  |
+|   **Mazda RX4 Wag**   |  21  |  6  |  160  | 110 | 3.9  |
+|    **Datsun 710**     | 22.8 |  4  |  108  | 93  | 3.85 |
+|  **Hornet 4 Drive**   | 21.4 |  6  |  258  | 110 | 3.08 |
+| **Hornet Sportabout** | 18.7 |  8  |  360  | 175 | 3.15 |
+|      **Valiant**      | 18.1 |  6  |  225  | 105 | 2.76 |
+|    **Duster 360**     | 14.3 |  8  |  360  | 245 | 3.21 |
+|     **Merc 240D**     | 24.4 |  4  | 146.7 | 62  | 3.69 |
+|     **Merc 230**      | 22.8 |  4  | 140.8 | 95  | 3.92 |
+|     **Merc 280**      | 19.2 |  6  | 167.6 | 123 | 3.92 |
+>>>>>>> dae7f17e56f8c462a38d058cebca820898f4ac51
