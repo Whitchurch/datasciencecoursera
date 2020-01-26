@@ -142,7 +142,7 @@ str(dataframeToMarkdown)
 
 View(dataframeToMarkdown)
 
-result <- pandoc.table.return(dataframeToMarkdown,style = "rmarkdown")
+result <- pandoc.table.return(dataframeToMarkdown,split.tables = Inf,style = "rmarkdown")
 class(result)
 
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
