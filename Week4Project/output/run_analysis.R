@@ -1,4 +1,5 @@
 #Step 0: Clear the environment variables 
+
 rm(list = ls())
 
 #Step 1: Execute the DataFrameCreator function
@@ -77,14 +78,11 @@ pathofinterest <- rstudioapi::getSourceEditorContext()$path
 # Create the Training Dataset by calling the function DataFrameCreator
 #Setup the correct paths:-
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
-pathtolaad1 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/X_train.txt",pathofinterest)
-pathtolaad2 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/y_train.txt",pathofinterest)
-pathtolaad3 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/train/subject_train.txt",pathofinterest)
-featurestoload <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
-#pathtolaad3 <- "./Week4Project/data/dataset/train/subject_train.txt"
-#pathtolaad1 <- "./Week4Project/data/dataset/train/X_train.txt"
-#pathtolaad2 <- "./Week4Project/data/dataset/train/y_train.txt"
-#featurestoload <- "./Week4Project/data/dataset/features.txt"
+pathtolaad1 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/train/X_train.txt",pathofinterest)
+pathtolaad2 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/train/y_train.txt",pathofinterest)
+pathtolaad3 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/train/subject_train.txt",pathofinterest)
+featurestoload <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
+
 
 #Call DataFrameCreator function to get the Trained Dataset 
 TrainDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 = pathtolaad3,features = featurestoload)
@@ -93,25 +91,26 @@ TrainDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 =
 #Step3:
 #Create the Test Dataset by calling the function DataFrame creator
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
-pathtolaad1 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/X_test.txt",pathofinterest)
-pathtolaad2 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/y_test.txt",pathofinterest)
-pathtolaad3 <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/test/subject_test.txt",pathofinterest)
-featurestoload <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
-#pathtolaad1 <- "./Week4Project/data/dataset/test/X_test.txt"
-#pathtolaad2 <- "./Week4Project/data/dataset/test/y_test.txt"
-#pathtolaad3 <- "./Week4Project/data/dataset/test/subject_test.txt"
-#featurestoload <- "./Week4Project/data/dataset/features.txt"
+pathtolaad1 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/test/X_test.txt",pathofinterest)
+pathtolaad2 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/test/y_test.txt",pathofinterest)
+pathtolaad3 <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/test/subject_test.txt",pathofinterest)
+featurestoload <- gsub("Week4Project/output/run_analysis.R","/Week4Project/data/dataset/features.txt",pathofinterest)
+
 
 #Call DataFrameCreator function to get the Trained Dataset 
 TestDataSet <- DataFrameCreator(path1 = pathtolaad1,path2 = pathtolaad2,path3 = pathtolaad3,features = featurestoload)
 
+result <- pandoc.table(TestDataSet[1:5,1:8],style="rmarkdown")
+
 #Step 4: Create the Merged Data Set; Merging Training and Test Datasets
 MergedDataSet <- rbind(TrainDataSet,TestDataSet)
+
 
 #Step5: Extract the mean and SD columns:-
 str(v1 <- grep("std|mean",names(MergedDataSet)))
 ColumnsToSelect <- names(MergedDataSet[v1])
 ColumnsToSelect <- append(ColumnsToSelect,c("volunteer_id","activities"),after = 0)
+
 
 #Note I have conscioulsy included MeafFrequency, as it calculates Mean of Frequencies, and qualifies as a Mean, albeit indirectly.
 str(ColumnsToSelect)
@@ -119,21 +118,30 @@ duplicated(ColumnsToSelect)
 
 #There seem to be some duplicate columns with the same name that is causing dplyr select to fail:-
 duplicateColumnMask <- duplicated(names(MergedDataSet))
-sum(as.integer(duplicateColumnMask)) #84 duplicates
+duplicatevalues <- sum(as.integer(duplicateColumnMask)) #84 duplicates
 
 v2 <- grep("std|mean",(names(MergedDataSet[duplicated(names(MergedDataSet))])))
 ColumnsToSelectV2 <- names(MergedDataSet[v2]) # returns 0, This means none of the duplicated columns are of interest to us
+
+
+
+sprintf("Total Number of Duplicate Columns = %i", duplicatevalues)
+sprintf("Are there any mean std columns that are duplicated= %i", sum(as.integer(ColumnsToSelectV2)))
 
 #Therefore instead of wrangling the data further, I take only the columns of interest, ignore the rest.
 MergedDataSet <- MergedDataSet[,ColumnsToSelect]
 str(MergedDataSet)
 
+result <- pandoc.table(MergedDataSet[1,],split.tables = Inf,style = "rmarkdown")
+
+
 #Step6: Use descriptive activity name for activities in the dataset
-MergedDataSet$activities
+print(head(MergedDataSet$activities,n=5))
+
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
-pathtolaad <- gsub("Week4Project/scripts/run_analysis.R","/Week4Project/data/dataset/activity_labels.txt",pathofinterest)
+pathtolaad <- gsub("/Week4Project/output/run_analysis.R","/Week4Project/data/dataset/activity_labels.txt",pathofinterest)
 #pathtoload <- "./Week4Project/data/dataset/activity_labels.txt"
-activityDF <- read.csv(pathtoload,header = FALSE,sep=" ")
+activityDF <- read.csv(pathtolaad,header = FALSE,sep=" ")
 activityDF <- activityDF%>%rename("activity_id" = "V1")
 activityDF <- activityDF%>%rename("activity" = "V2")
 
@@ -154,7 +162,8 @@ for(X in activityDF$activity_id)
   }
 }
 
-names(MergedDataSet)
+head(MergedDataSet$activities,n=5)
+
 
 #Step 7: Give more descriptive names for the variables so non-domain experts understand it
 names(MergedDataSet) <- gsub("-","",names(MergedDataSet))
@@ -202,7 +211,7 @@ ncol(tidySet)
 #========================Generating the required filed: tidydata.txt=====================#
 #Writing the tidyDataSet
 pathofinterest <- rstudioapi::getSourceEditorContext()$path
-pathtolaad <- gsub("Week4Project/scripts/run_analysis.R","Week4Project/output/tidydata.txt",pathofinterest)
+pathtolaad <- gsub("Week4Project/output/run_analysis.R","Week4Project/output/tidydata.txt",pathofinterest)
 write.csv(tidySet,pathtolaad,row.names = FALSE)
 
 
