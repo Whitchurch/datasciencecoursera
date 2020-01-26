@@ -9,7 +9,6 @@ output:
 
 ## Introduction
 
-
 This document (Readme.Rmd) will guide the reader through the various sections that comprise this week's assignment.
 It will explain the context of the data; the script to analyze the data; the resultant dataset generated;
 justify why the resultant dataset is tidy. Finally, it will provide a script to view the tidydata which was generated.
