@@ -214,5 +214,5 @@ pathofinterest <- rstudioapi::getSourceEditorContext()$path
 pathtolaad <- gsub("Week4Project/output/run_analysis.R","Week4Project/output/tidydata.txt",pathofinterest)
 write.csv(tidySet,pathtolaad,row.names = FALSE)
 
-#==== End of file =====#
+#==== End of file ======#
 
