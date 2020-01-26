@@ -142,6 +142,14 @@ str(dataframeToMarkdown)
 
 View(dataframeToMarkdown)
 
-pandoc.table(dataframeToMarkdown,style = "rmarkdown")
+result <- pandoc.table.return(dataframeToMarkdown,style = "rmarkdown")
+class(result)
+
+pathofinterest <- rstudioapi::getSourceEditorContext()$path
+pathofinterest <- gsub("codebookGenerator.R","codebook.md",pathofinterest)
+
+fileconn <- file(pathofinterest)
+writeLines(result,fileconn)
+close(fileconn)
 
 
