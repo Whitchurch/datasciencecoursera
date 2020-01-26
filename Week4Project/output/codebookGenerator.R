@@ -133,14 +133,11 @@ validRange <- gsub("String","Values: LAYING, SITTING, STANDING, WALKING, WALKING
 validRange <- gsub("Time","10^9 accuracy in decimal",validRange)
 validRange <- gsub("Frequency","10^9 accuracy in decimal",validRange)
 
-dataframeToMarkdown <- columnNames
-dataframeToMarkdown <- cbind(dataframeToMarkdown,columnUnits)
-dataframeToMarkdown <- cbind(dataframeToMarkdown,validRange)
-dataframeToMarkdown <- cbind(dataframeToMarkdown,columnDescription)
+VariableName <- columnNames
+VariableName <- cbind(VariableName,columnUnits)
+VariableName <- cbind(VariableName,validRange)
+VariableName <- cbind(VariableName,columnDescription)
 
-str(dataframeToMarkdown)
-
-View(dataframeToMarkdown)
 
 result <- pandoc.table.return(dataframeToMarkdown,split.tables = Inf,style = "rmarkdown")
 class(result)
