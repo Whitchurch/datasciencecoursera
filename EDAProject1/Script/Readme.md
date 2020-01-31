@@ -26,9 +26,9 @@ This archive contains 2075259 measurements gathered in a house located in Sceaux
 - 8.sub_metering_2: energy sub-metering No. 2 (in watt-hour of active energy). It corresponds to the laundry room, containing a washing-machine, a tumble-drier, a refrigerator and a light. 
 - 9.sub_metering_3: energy sub-metering No. 3 (in watt-hour of active energy). It corresponds to an electric water-heater and an air-conditioner.
 
-### Missing values: *There are 25979 missing values*
+### Missing values: *There are 25979 rows with missing values*
 
-### **They are listed below**
+### **They are listed below by index**
    [1]   6840   6841  19725  19726  41833  61910  98255  98256 142589 190498 190499
   [12] 190500 190501 190502 190503 190504 190505 190506 190507 190508 190509 190510
   [23] 190511 190512 190513 190514 190515 190516 190517 190518 190519 190520 190521
