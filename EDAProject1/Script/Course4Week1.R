@@ -6,6 +6,7 @@ pathofinterest <- gsub("Script/Course4Week1.R","Data/household_power_consumption
 
 if(file.exists(pathofinterest))
 {
+  #=================Prelimnary investigation for missing values ======#
   print("the file exists")
   
   readDataFrame <- read.csv(pathofinterest,header = TRUE,sep = ";")
@@ -35,11 +36,17 @@ if(file.exists(pathofinterest))
    #therefore 2075259 - 2049280 = 25979.  And this corresponds to the fact that missing values occur only in the Sub_metering_3 column.
    
   # We are going to grep the ? to see if that occurs in other rows as well
-   length(grep("[?]",readDataFrame$Global_active_power)) #etc.
+  
    
-   # it looks like ? only occurs in the same rows that have NAs.
+    grep("[?]",readDataFrame$Global_active_power) #etc.
+# it looks like ? only occurs in the same rows that have NAs.
    
   
+    
+    #=============Beginning of the analysis ========#
+    
+    
+    
   }else{
   print("File absent: ending execution")
 }
