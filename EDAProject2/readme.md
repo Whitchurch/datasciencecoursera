@@ -63,10 +63,10 @@ We will print the first row of this SCC data set:-
 
 We will now look at NEI:- 
 
-|   SCC    | Data.Category |                                 Short.Name                                 |               EI.Sector                | Option.Group | Option.Set |        SCC.Level.One        |    SCC.Level.Two    | SCC.Level.Three |          SCC.Level.Four           | Map.To | Last.Inventory.Year | Created_Date | Revised_Date | Usage.Notes |
-|:--------:|:-------------:|:--------------------------------------------------------------------------:|:--------------------------------------:|:------------:|:----------:|:---------------------------:|:-------------------:|:---------------:|:---------------------------------:|:------:|:-------------------:|:------------:|:------------:|:-----------:|
-| 10100101 |     Point     |          Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal          | Fuel Comb - Electric Generation - Coal |              |            | External Combustion Boilers | Electric Generation | Anthracite Coal |          Pulverized Coal          |   NA   |         NA          |              |              |             |
-| 10100102 |     Point     | Ext Comb /Electric Gen /Anthracite Coal /Traveling Grate (Overfeed) Stoker | Fuel Comb - Electric Generation - Coal |              |            | External Combustion Boilers | Electric Generation | Anthracite Coal | Traveling Grate (Overfeed) Stoker |   NA   |         NA          |              |              |             |
+| &nbsp; | fips  |   SCC    | Pollutant | Emissions | type  | year |
+|:------:|:-----:|:--------:|:---------:|:---------:|:-----:|:----:|
+| **4**  | 09001 | 10100401 | PM25-PRI  |   15.71   | POINT | 1999 |
+| **8**  | 09001 | 10100404 | PM25-PRI  |   234.2   | POINT | 1999 |
 
 fips: A five-digit number (represented as a string) indicating the U.S. county
 
