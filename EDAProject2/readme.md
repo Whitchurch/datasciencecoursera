@@ -52,6 +52,7 @@ we now look at the column names of SCC:
 provides a mapping from the SCC digit strings in the Emissions table to the actual name of the PM2.5 source. The sources are categorized in a few different ways from more general to more specific and you may choose to explore whatever categories you think are most useful.
 
 We will print the first row of this SCC data set:-
+
 |   SCC    | Data.Category |                                 Short.Name                                 |               EI.Sector                | Option.Group | Option.Set |        SCC.Level.One        |    SCC.Level.Two    |        SCC.Level.Three        |                SCC.Level.Four                 | Map.To | Last.Inventory.Year | Created_Date | Revised_Date | Usage.Notes |
 |:--------:|:-------------:|:--------------------------------------------------------------------------:|:--------------------------------------:|:------------:|:----------:|:---------------------------:|:-------------------:|:-----------------------------:|:---------------------------------------------:|:------:|:-------------------:|:------------:|:------------:|:-----------:|
 | 10100101 |     Point     |          Ext Comb /Electric Gen /Anthracite Coal /Pulverized Coal          | Fuel Comb - Electric Generation - Coal |              |            | External Combustion Boilers | Electric Generation |        Anthracite Coal        |                Pulverized Coal                |   NA   |         NA          |              |              |             |
@@ -79,4 +80,51 @@ type: The type of source (point, non-point, on-road, or non-road)
 
 year: The year of emissions recorded
 
+
+Now that we have a handle of what the datastes represent.
+
+To solve our question, we need to calculate the total emission of all sources of PM2.5 emission, on a per
+yearly basis.
+
+This is accomplished using the tapply function: where, emission is caluclated, subset by years, and sum is the function to find the total.
+
+```{r,eval=FALSE}
+#using tapply to subset across all years and apply this sum function
+plot1Result <- tapply(NEI$Emissions, NEI$year, sum)
+```
+
+plot1Result now has the subsetted totals by year. 
+
+we view it now:
+> plot1Result
+   1999    2002    2005    2008 
+7332967 5635780 5454703 3464206 
+
+Now I decided to use a barplot to, plot the total emission for each year:-
+
+```{r,eval=FALSE}
+# Plotting the data
+options(scipen = 999) #deactivate scientific notations
+```
+```{r,eval=FALSE}
+barplot(plot1Result, xlab = "Years", ylab = "Total emission in (Tons)", main = "PM 2.5 Emission from 1999 - 2008")
+```
+
+This line generates the bar plot. However to make the plot more descriptive and make trends apparent. I added a trend line with a legend indicating the data's trend.
+
+```{r,eval=FALSE}
+lines(plot1Result, col = "red")
+points(plot1Result, pch = 16, col = "red")
+legend("topright",legend = c("Emission trend line"),lty = 1,col ="red", bty = "n")
+```
+
+The final result of the plotting code is show below:-
+![plot of chunk plot1](plot1.png)
+
+From the plot the following is apparent:
+- There has been a decrease in the PM 2.5 pollutant over a period from 1999 - 2008
+- Also the trend lines show how steep the decrease is between the various box plots
+- There has been a particularly steep decrease from 2005 - 2008.
+
+### Answer: Emissions have indeed decreased from 1999 to 2008 
 

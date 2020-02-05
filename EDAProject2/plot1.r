@@ -21,11 +21,13 @@ NEI <- readfiles("plot1.r","summarySCC_PM25.rds")
 #Analyze the structure of the Data in both SCC and NEI
 str(SCC)
 names(SCC)
-head(SCC)
+library(pander)
+head(SCC, n = 1)
 
 str(NEI)
 names(NEI)
 head(NEI)
+result <- pandoc.table(head(SCC, n = 2),split.tables = Inf,style="rmarkdown")
 unique(NEI$type)  # 4 types are present
 unique(NEI$Pollutant)  # Table has data on only PM 2.5 
 str(unique(NEI$SCC)) # there are 5387 unique source classification codes in this data set.
