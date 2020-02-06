@@ -128,3 +128,48 @@ From the plot the following is apparent:
 
 ### Answer: Emissions have indeed decreased from 1999 to 2008 
 
+## Plot 2: Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips=="24510") from 1999 to 2008?
+To do this we begin by grouping the data by fips and year
+```{r,eval=FALSE}
+baltimoreonly <- group_by(NEI, year)
+baltimoreonly <- group_by(baltimoreonly, fips, add = TRUE)
+baltimoreonly <- summarize_at(baltimoreonly,.vars = c("Emissions") ,.funs = sum)%>%filter(fips == "24510")
+```
+
+> print(baltimoreonly)
+# A tibble: 4 x 2
+# Groups:   year [4]
+   year Emissions
+  <int>     <dbl>
+1  1999     3274.
+2  2002     2454.
+3  2005     3091.
+4  2008     1862.
+
+Then we prepare the data as a 1 dimensional array of emissions, with years as attributes to be used inside the barplot
+
+```{r,eval=FALSE}
+#convert the data into a one dimensional array with attributes for display in barplot
+
+length(baltimoreonly$year)
+arrayForBarplot <- array(baltimoreonly$Emissions, dim = length(baltimoreonly$year))
+dimnames(arrayForBarplot) <- list(baltimoreonly$year)
+```
+
+Finally. plot the result:-
+```{r,eval=FALSE}
+png(path1,width = 480, height = 480)
+barplot(arrayForBarplot, xlab = "Years", ylab = "Total emission in (Tons)", main = "(Baltimore City) 1999 - 2008: PM 2.5 emission")
+lines(arrayForBarplot, col = "green")
+points(arrayForBarplot, pch = 16, col = "green")
+legend("topright",legend = c("Trend"),lty = 1,col ="green", bty = "n")
+
+```
+
+The final result of the plotting code is show below:-
+![plot of chunk plot2](plot2.png)
+
+From the plot the following is apparent:
+- There has been a decrease in the PM 2.5 pollutant over a period from 1999 - 2008
+- There was a spike in polluton between 2002 and 2005
+- After which pollution has fallen in 2008 
