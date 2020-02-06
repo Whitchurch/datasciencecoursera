@@ -27,7 +27,7 @@ head(SCC, n = 1)
 str(NEI)
 names(NEI)
 head(NEI)
-result <- pandoc.table(head(SCC, n = 2),split.tables = Inf,style="rmarkdown")
+result <- pandoc.table(head(NEI, n = 2),split.tables = Inf,style="rmarkdown")
 unique(NEI$type)  # 4 types are present
 unique(NEI$Pollutant)  # Table has data on only PM 2.5 
 str(unique(NEI$SCC)) # there are 5387 unique source classification codes in this data set.
@@ -46,8 +46,7 @@ sum(datafrom1999) #73329767 tons is the total pm2.5 emission from all pollutant 
 #Method 2:-
 #using tapply to subset across all years and apply this sum function
 plot1Result <- tapply(NEI$Emissions, NEI$year, sum) # we get 7332967 5635780 5454703 3464206 , year 1999 matches what we got in method 1, thus proving tapply works.
-
-
+str(plot1Result)
 # Plotting the data
 options(scipen = 999) #deactivate scientific notations
 currentpath <- rstudioapi::getSourceEditorContext()$path
