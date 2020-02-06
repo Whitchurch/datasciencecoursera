@@ -173,3 +173,26 @@ From the plot the following is apparent:
 - There has been a decrease in the PM 2.5 pollutant over a period from 1999 - 2008
 - There was a spike in polluton between 2002 and 2005
 - After which pollution has fallen in 2008 
+
+## Plot 3: Of the four types of sources indicated by the type type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
+
+To do this we begin by grouping, by year, by type and by fips for Baltimore City:
+```{r,eval=FALSE}
+typeyearsubset <- group_by(NEI, year)
+typeyearsubset <- group_by(typeyearsubset,type, add = TRUE)%>%filter(fips == "24510")
+```
+
+Then run the qplot from the ggplot package to plot the trends for the differet source types:
+```{r,eval=FALSE}
+qplot(year,Emissions, data = typeyearsubset, color = type, geom = "line", main = "Emission by types (Baltimore City)1999 - 2008")
+```
+
+The final result of the plotting code is show below:-
+![plot of chunk plot3](plot3.png)
+
+From the plot the following is apparent:
+- There has been a marked increase in pollution from "point" type source betweem 2002 - 2005
+- The remaining point types have shown no appreciable increase, but have been on a downward trend
+- So the type "point" seems to explain the reason for the spike in PM2.5 pollution in plot2.
+
+
