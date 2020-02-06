@@ -195,4 +195,29 @@ From the plot the following is apparent:
 - The remaining point types have shown no appreciable increase, but have been on a downward trend
 - So the type "point" seems to explain the reason for the spike in PM2.5 pollution in plot2.
 
+## Plot 4: Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
+
+To do this we subset the SCC codes for coal+ combustion. We then use the SCC codes from the (coal+combustion) subset to extract only the rows from NEI, that share the common SCC codes from the (coal+combustion)subset before plotting it.
+
+```{r,eval=FALSE}
+indexforCombustion <- grep("[C,c]omb",SCC$SCC.Level.One) # rows filtered by combustion
+indexforCoal <- grep("[C,c]oal", SCC$SCC.Level.Three) # rows filtered by coal.
+
+#we need the values for combustion by coal. So we will be using these 2 indexes
+options(scipen = 999) #deactivate scientific notations
+SCCCombustion <- SCC[indexforCombustion,]
+SCCCCoal <- SCC[indexforCoal,]
+SCCCCoal <- SCCCCoal[(SCCCCoal$SCC%in%SCCCombustion$SCC),]
+
+
+NEIFiltered <-  NEI[(NEI$SCC%in%SCCCCoal$SCC),] # this gives us the coal combustion sources (subsetted)
+typeyearsubset <- group_by(NEIFiltered, year)
+typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = sum)
+```
+
+The final result of the plotting code is show below:-
+![plot of chunk plot4](plot4.png)
+
+From the plot the following is apparent:
+- There has been a noticable decrease in coal combustion form 2005 - 2008
 

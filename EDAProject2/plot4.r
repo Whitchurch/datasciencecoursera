@@ -26,6 +26,7 @@ indexforCombustion <- grep("[C,c]omb",SCC$SCC.Level.One) # rows filtered by comb
 indexforCoal <- grep("[C,c]oal", SCC$SCC.Level.Three) # rows filtered by coal.
 
 #we need the values for combustion by coal. So we will be using these 2 indexes
+options(scipen = 999) #deactivate scientific notations
 SCCCombustion <- SCC[indexforCombustion,]
 SCCCCoal <- SCC[indexforCoal,]
 SCCCCoal <- SCCCCoal[(SCCCCoal$SCC%in%SCCCombustion$SCC),]
@@ -35,6 +36,17 @@ NEIFiltered <-  NEI[(NEI$SCC%in%SCCCCoal$SCC),] # this gives us the coal combust
 typeyearsubset <- group_by(NEIFiltered, year)
 typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = sum)
 
+
+arrayForBarplot <- array(typeyearsubset$Emissions, dim = length(typeyearsubset$year))
+dimnames(arrayForBarplot) <- list(typeyearsubset$year)
+currentpath <- rstudioapi::getSourceEditorContext()$path
+path1 = gsub("plot4.r","plot4.png", currentpath)
+png(path1,width = 480, height = 480)
+barplot(arrayForBarplot, xlab = "Years", ylab = "Total emission in (Tons)", main = "Coal Combustion from : 1999 - 2008", col = "blue")
+lines(arrayForBarplot, col = "green",lwd = 3)
+points(arrayForBarplot, pch = 16, col = "green")
+legend("topright",legend = c("Trend"),lty = 1,col ="green", bty = "n", lwd = 3)
+dev.off()
 
 # str(grep("[C,c]oal",SCC$EI.Sector, value = TRUE))
 # str(SCC$EI.Sector)
