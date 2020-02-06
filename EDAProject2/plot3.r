@@ -35,6 +35,8 @@ typeyearsubset <- group_by(typeyearsubset,type, add = TRUE)%>%filter(fips == "24
 
 typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = sum)
 type <- as.factor(typeyearsubset$type)
-qplot(year,Emissions, data = typeyearsubset, color = type, geom = "line", main = "Emission by types (Baltimore City)1999 - 2008")
+#qplot(year,Emissions, data = typeyearsubset, color = type, geom = "line", main = "Emission by types (Baltimore City)1999 - 2008")
+p <- ggplot(typeyearsubset, aes(year,Emissions))+geom_line(aes(color = type))+labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)"))
+p+labs(title=expression("Emission by types (Baltimore City)1999 - 2008"))
 dev.off()
 

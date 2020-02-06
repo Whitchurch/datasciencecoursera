@@ -184,7 +184,9 @@ typeyearsubset <- group_by(typeyearsubset,type, add = TRUE)%>%filter(fips == "24
 
 Then run the qplot from the ggplot package to plot the trends for the differet source types:
 ```{r,eval=FALSE}
-qplot(year,Emissions, data = typeyearsubset, color = type, geom = "line", main = "Emission by types (Baltimore City)1999 - 2008")
+p <- ggplot(typeyearsubset, aes(year,Emissions))+geom_line(aes(color = type))+labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)"))
+p+labs(title=expression("Emission by types (Baltimore City)1999 - 2008"))
+
 ```
 
 The final result of the plotting code is show below:-
