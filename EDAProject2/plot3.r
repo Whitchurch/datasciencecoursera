@@ -37,3 +37,4 @@ typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = s
 type <- as.factor(typeyearsubset$type)
 qplot(year,Emissions, data = typeyearsubset, color = type, geom = "line", main = "Emission by types (Baltimore City)1999 - 2008")
 dev.off()
+
