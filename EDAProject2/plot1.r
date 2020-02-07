@@ -52,7 +52,7 @@ options(scipen = 999) #deactivate scientific notations
 currentpath <- rstudioapi::getSourceEditorContext()$path
 path1 = gsub("plot1.r","plot1.png", currentpath)
 png(path1,width = 480, height = 480)
-barplot(plot1Result, xlab = "Years", ylab = "Total emission in (Tons)", main = "PM 2.5 Emission from 1999 - 2008")
+barplot(plot1Result, xlab = "Years", ylab = "Total emission PM 2.5 in (Tons)", main = "PM 2.5 Emission from 1999 - 2008")
 lines(plot1Result, col = "red")
 points(plot1Result, pch = 16, col = "red")
 legend("topright",legend = c("Emission trend line"),lty = 1,col ="red", bty = "n")

@@ -79,6 +79,21 @@ dim(nonRoadMVDContribution) # So we get 57 items which are of relavance from non
 totalmvdContribution <- rbind(onRoadMVD,nonRoadMVDContribution)
 dim(totalmvdContribution)
 
-#Now the data is ready to be analyzed to answer our question:
+#Now the data is ready to be analyzed to answer our question:  How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
 
+NEIFiltered <-  NEI[(NEI$SCC%in%totalmvdContribution$SCC),] # this gives us MVD subsetted by the TotalMVD: includes the Onroad and Non-Road types of relevance
+typeyearsubset <- group_by(NEIFiltered, year)%>%filter(fips == "24510")
+
+typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = sum)
+
+arrayForBarplot <- array(typeyearsubset$Emissions, dim = length(typeyearsubset$year))
+dimnames(arrayForBarplot) <- list(typeyearsubset$year)
+currentpath <- rstudioapi::getSourceEditorContext()$path
+path1 = gsub("plot5.r","plot5.png", currentpath)
+png(path1,width = 480, height = 480)
+barplot(arrayForBarplot, xlab = "Years", ylab = "Total emission PM 2.5 in (Tons)", main = "MVD Emission (Baltimore) : 1999 - 2008", col = "red")
+lines(arrayForBarplot, col = "green",lwd = 3)
+points(arrayForBarplot, pch = 16, col = "green")
+legend("topright",legend = c("Trend"),lty = 1,col ="green", bty = "n", lwd = 3)
+dev.off()
 

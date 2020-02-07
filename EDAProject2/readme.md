@@ -223,3 +223,60 @@ The final result of the plotting code is show below:-
 From the plot the following is apparent:
 - There has been a noticable decrease in coal combustion form 2005 - 2008
 
+## Plot 5: How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+
+To conduct this analysis we first extract both the onRoad and Non-Onroad sources of pollution:
+```{r,eval=FALSE}
+onRoadMVD <- SCC%>%filter(Data.Category == "Onroad")  #Onroad vehicles
+nonRoadMVD <- SCC%>%filter(Data.Category == "Nonroad") #Off road vehicles
+
+```
+
+We then filter the Non-Onroad vechicles to only relevant ones, excluding garden equipment etc etc
+```{r,eval=FALSE}
+mask <- nonRoadMVD$SCC.Level.Four == "Motorcycles: Off-road"|nonRoadMVD$SCC.Level.Four == "Snowmobiles"|nonRoadMVD$SCC.Level.Four == "All Terrain Vehicles"|nonRoadMVD$SCC.Level.Four == "Minibikes"|nonRoadMVD$SCC.Level.Four == "Golf Carts"|nonRoadMVD$SCC.Level.Four == "Specialty Vehicles/Carts"|nonRoadMVD$SCC.Level.Four == "Ocean-going Vessels"|nonRoadMVD$SCC.Level.Four == "Harbor Vessels"|nonRoadMVD$SCC.Level.Four == "Fishing Vessels"|nonRoadMVD$SCC.Level.Four == "Military Vessels"|nonRoadMVD$SCC.Level.Four == "Outboard" |nonRoadMVD$SCC.Level.Four == "Inboard"|nonRoadMVD$SCC.Level.Four == "Personal Water Craft" |nonRoadMVD$SCC.Level.Four == "Sailboat Auxiliary Inboard" |nonRoadMVD$SCC.Level.Four == "Sailboat Auxiliary Outboard"
+
+nonRoadMVDContribution <- nonRoadMVD[mask,]
+
+
+# To summarize
+dim(onRoadMVD) #1137 MVD
+dim(nonRoadMVD) #572 some are vechicles/vessels, the rest is noise.
+dim(nonRoadMVDContribution) # So we get 57 items which are of relavance from nonRoad as MVD
+
+```
+
+Then we combine only the onRoad and the filtered out essential Non-Road contributors
+```{r,eval=FALSE}
+# We now do a Row bind of onRoadMVD with nonRoadMVDContribution: we will get 1194 rows and 15 columns
+totalmvdContribution <- rbind(onRoadMVD,nonRoadMVDContribution)
+dim(totalmvdContribution)
+```
+
+Now we plot , the Total Mvd Contribution, subgrouping by year and , subrouping by Baltimore City:
+```{r,eval=FALSE}
+NEIFiltered <-  NEI[(NEI$SCC%in%totalmvdContribution$SCC),] # this gives us MVD subsetted by the TotalMVD: includes the Onroad and Non-Road types of relevance
+typeyearsubset <- group_by(NEIFiltered, year)%>%filter(fips == "24510")
+
+typeyearsubset <- summarize_at(typeyearsubset, .vars = c("Emissions") ,.funs = sum)
+
+arrayForBarplot <- array(typeyearsubset$Emissions, dim = length(typeyearsubset$year))
+dimnames(arrayForBarplot) <- list(typeyearsubset$year)
+currentpath <- rstudioapi::getSourceEditorContext()$path
+path1 = gsub("plot5.r","plot5.png", currentpath)
+png(path1,width = 480, height = 480)
+barplot(arrayForBarplot, xlab = "Years", ylab = "Total emission in (Tons)", main = "MVD Emission (Baltimore) : 1999 - 2008", col = "red")
+lines(arrayForBarplot, col = "green",lwd = 3)
+points(arrayForBarplot, pch = 16, col = "green")
+legend("topright",legend = c("Trend"),lty = 1,col ="green", bty = "n", lwd = 3)
+dev.off()
+```
+The final result of the plotting code is show below:-
+![plot of chunk plot5](plot5.png)
+
+From the plot the following is apparent:
+- There has been a marked fall in Emission due to Motor Vehicles from 1999 - 2002
+- There has been another high fall in emissions from 2005 - 2008
+- This is interesting and we could delve deeper to see, why emission reduced for PM 2.5 in Baltimore
+
+
