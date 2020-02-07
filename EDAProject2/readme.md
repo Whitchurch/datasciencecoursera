@@ -279,4 +279,52 @@ From the plot the following is apparent:
 - There has been another high fall in emissions from 2005 - 2008
 - This is interesting and we could delve deeper to see, why emission reduced for PM 2.5 in Baltimore
 
+## Plot 5: How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City vs LA
+All the pre-processing steps are the same as for plot.5 upto the point where we get the totalmvdcontribution
+
+We then make separate sets for Baltimore and LA
+
+```{r,eval=FALSE}
+typeyearsubsetBalti <- group_by(NEIFiltered, year)%>%filter(fips == "24510")
+typeyearsubsetLA <- group_by(NEIFiltered, year)%>%filter(fips == "06037")
+dim(typeyearsubsetBalti)
+dim(typeyearsubsetLA)
+```
+
+Combine these to a new set
+
+```{r,eval=FALSE}
+typeyearTotal <- rbind(typeyearsubsetBalti,typeyearsubsetLA)
+dim(typeyearTotal)
+```
+
+Apply Group by and summarize
+```{r,eval=FALSE}
+typeYearTotalByCity <- group_by(typeyearTotal, fips, add = TRUE)
+typeYearTotalByCity <- summarize_at(typeYearTotalByCity, .vars = c("Emissions") ,.funs = sum)
+
+```
+
+Then plot the information : We see from the first plot that the plot is skewed towards LA
+```{r,eval=FALSE}
+city <- as.factor(typeYearTotalByCity$fips)
+p1 <- ggplot(typeYearTotalByCity, aes(year,Emissions))+geom_line(aes(color = city))+labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)"))
+p1+labs(title=expression("Emission Baltimore Vs Los Angeles1999 - 2008"))
+```
+![plot of chunk plot6_skewed](plot6_skewed.png)
+
+We thus use a log scale for EMission to get a better idea of trends
+
+```{r,eval=FALSE}
+#log scale
+city <- as.factor(typeYearTotalByCity$fips)
+p2 <- ggplot(typeYearTotalByCity, aes(year,log2(Emissions)))+geom_line(aes(color = city))+labs(x="year", y=expression("Total PM"[2.5]*" Emission (Tons)"))
+p2+labs(title=expression("Emission Baltimore Vs Los Angeles1999 - 2008"))+scale_y_continuous(breaks = seq(6,14,1))
+```
+![plot of chunk plot6](plot6.png)
+From the plot the following is apparent:
+- Baltimore has a more pronounced change in emission over a period from 1999 - 2008
+- LA has a gradual increase in emission and a gradual decrease on reacling 2008
+- Baltimore has always had a downward trend in emission from 1999 - 2008
+
 
