@@ -42,7 +42,7 @@ dimnames(arrayForBarplot) <- list(typeyearsubset$year)
 currentpath <- rstudioapi::getSourceEditorContext()$path
 path1 = gsub("plot4.r","plot4.png", currentpath)
 png(path1,width = 480, height = 480)
-barplot(arrayForBarplot, xlab = "Years", ylab = "Total emission in (Tons)", main = "Coal Combustion from : 1999 - 2008", col = "blue")
+barplot(arrayForBarplot, xlab = "Years", ylab = "Total PM 2.5 emission in (Tons)", main = "Coal Combustion from : 1999 - 2008", col = "blue")
 lines(arrayForBarplot, col = "green",lwd = 3)
 points(arrayForBarplot, pch = 16, col = "green")
 legend("topright",legend = c("Trend"),lty = 1,col ="green", bty = "n", lwd = 3)
