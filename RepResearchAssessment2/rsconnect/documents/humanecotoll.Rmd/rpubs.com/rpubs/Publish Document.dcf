@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/575331/0527fb55d3f948a5ae6f274b5d2b3d61
+bundleId: https://api.rpubs.com/api/v1/document/575331/0527fb55d3f948a5ae6f274b5d2b3d61
+url: http://rpubs.com/wmuthuma/575331
+when: 1581923115.62753

@@ -1,0 +1,302 @@
+---
+title: 'Analysis of Natural Catastrophies on Life and Economy from: (1950 - November
+  2011)'
+author: "Whitchurch Muthumani"
+date: "2/17/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+### <span style="color: brown">Synopsis</span>
+Natural Catastrophies such as Storms, Tornadoes Fires, etc cause major disruptions in the areas where they occur.  
+
+This document presents and analysis of the effects of such catastrophies which have been labeled as "Events" for the purpose of analysis.  
+
+It seeks to answer the following questions:  
+
+1. Across the United States, which types of events  are most harmful with respect to population health?
+2. Across the United States, which types of events have the greatest economic consequences?
+
+The document is broken into the following sections:
+1. Data Processing 
+2. Results
+
+### <span style="color: brown">1. Data Processing</span>
+
+Data processing is broken down into 2 steps:
+1.1 Loading the data
+1.2 Cleaning up the data
+
+#### <span style="color: brown">1.1 Loading the data</span>  
+```{r}
+library(dplyr)
+library(ggplot2)
+library(colorspace)
+library(gridExtra)
+```
+
+
+```{r cache=TRUE}
+#====== Begin by loading the data=====
+datatoanalyze <- read.csv("repdata-data-StormData.csv.bz2", header = TRUE, sep = ",")
+```
+
+#### Code breakdown:
+- *Line 1- 4: load required packages.*
+- *Line 5: unzips the bz2 file and reads contents into the datatoanalyze dataframe.*
+
+
+```{r}
+#== Analyze the structure of the dataset
+str(datatoanalyze)
+datatoanalyze$EVTYPE <- as.character(datatoanalyze$EVTYPE)
+length(unique(datatoanalyze$EVTYPE))
+```
+
+The basic structure of the dataframe has been printed out for analysis, It has the following:  
+
+- 902297 rows and 37 columns
+- **EVTYPE:** The name of the "Event" (Natural Catastrophe)
+- **FATALATIES:** Number of deaths due to "Event"
+- **INJURIES:** Number of injuries due to "Event"
+- **PROPDMG:** property damages cost due to "Event"
+- **CROPDMG:** crops damages cost due to "Event"
+- **PROPDMGEXP:** Property damage in powers of 10
+- **CROPDMGEXP:** Crop damage in powers of 10
+
+
+#### <span style="color: brown">1.2 Cleaning up the data</span>  
+
+#### Part 1: Removing the aliases for the event names, and associating them with the NOAA list of approvent events
+
+We begin by viewing the table of all events:  
+```{r cache=TRUE}
+#sort(table(datatoanalyze$EVTYPE))
+unique(datatoanalyze$EVTYPE)
+```
+
+We see there are many events that are not part of the approved list of events from the NOAA database.  
+We proceed to clean up the data by combining the **major ones** into valid event types.  
+
+*Note: I've done most, but not all of the events , there has been a reduction 985 to 165*
+
+```{r cache=TRUE}
+#=== Combine tose non-NOAA events into NOAA event types.
+datatoanalyze[grep("(^TSTM)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Thunderstorm Wind" 
+datatoanalyze[grep("(^Thunder|thunderstorm)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Thunderstorm Wind" 
+datatoanalyze[grep("(^Thu)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Thunderstorm Wind" 
+datatoanalyze[grep("^hurr",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Hurricane/Typhoon" 
+datatoanalyze[grep("^typ",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Hurricane/Typhoon" 
+datatoanalyze[grep("(^heavy snow)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Heavy Snow" 
+datatoanalyze[grep("(^heavy rain)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Heavy Rain" 
+datatoanalyze[grep("(^hail|hail)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Hail" 
+datatoanalyze[grep("(^high wind)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "High Wind" 
+datatoanalyze[grep("(^tornado|^TORNDAO)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Tornado" 
+datatoanalyze[grep("(^rip)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Rip Current" 
+datatoanalyze[grep("(^wild)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Wildfire"
+datatoanalyze[grep("(^summary)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Summary"
+datatoanalyze[grep("(^lightn)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Lightning"
+datatoanalyze[grep("(^winter weather)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Winter Weather"
+datatoanalyze[grep("(^volcanic)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Volcanic Ash"
+datatoanalyze[grep("(^winter stor|^snow)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Winter Storm"
+datatoanalyze[grep("(flood)",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Flood"
+datatoanalyze[grep("^water",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Waterspout"
+datatoanalyze[grep("mix$",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Sleet"
+datatoanalyze[grep("wind",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Strong Wind"
+datatoanalyze[grep("Ice|Icy",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Ice Storm"
+datatoanalyze[grep("heat|warm|hot",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Heat"
+datatoanalyze[grep("coast",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Coastal Flood"
+datatoanalyze[grep("cold",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Extreme Cold/Wind Chill"
+datatoanalyze[grep("tropical s",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Tropical Storm"
+datatoanalyze[grep("tropical d",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Tropical Depression"
+datatoanalyze[grep("snow",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Heavy Snow"
+datatoanalyze[grep("rain|slide",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Heavy Rain"
+datatoanalyze[grep("og$",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Dense Fog"
+datatoanalyze[grep("smoke",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Dense Smoke"
+datatoanalyze[grep("freez",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Frost/Freeze"
+datatoanalyze[grep("surf",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "High Surf"
+datatoanalyze[grep("surge",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Storm Surge/Tide"
+datatoanalyze[grep("funnel",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Funnel Cloud"
+datatoanalyze[grep("fld",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Flood"
+datatoanalyze[grep("blizzard",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Blizzard"
+datatoanalyze[grep("wind$|WND$",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Strong Wind"
+datatoanalyze[grep("HYPERTHERMIA/EXPOSURE|hypothermia|RECORD LOW|RECORD COOL|RECORD PRECIPITATION",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Extreme Cold/Wind Chill"
+datatoanalyze[grep("DRY SPELL|DRY WEATHER|RECORD HIGH TEMPERATURE|RECORD HIGH|HIGH TEMPERATURE RECORD|RECORD DRYNESS|Record dry month|Temperature record|Record temperature|Record temperatures",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Excessive Heat"
+datatoanalyze[grep("\\?",datatoanalyze$EVTYPE, ignore.case = T),"EVTYPE"] <- "Other"
+
+```
+
+We now look at the newly cleaned up set of events:  
+
+```{r cache=TRUE}
+#=== Newly reduced list of events
+#sort(table(datatoanalyze$EVTYPE))
+unique(datatoanalyze$EVTYPE)
+```
+
+#### Part 2:  Processing the Property and Crop Damages, by changing the EXP to their respective exponents.and then multiplying the exponents with the values to get the total values
+
+First we prepare the data that needs to be cleaned, converting factors to characters
+```{r}
+datatoanalyze$PROPDMGEXP <- as.character(datatoanalyze$PROPDMGEXP)
+listofPROPDMGEXP <- unique(datatoanalyze$PROPDMGEXP)
+
+datatoanalyze$CROPDMGEXP <- as.character(datatoanalyze$CROPDMGEXP)
+listofCROPDMGEXP <- unique(datatoanalyze$CROPDMGEXP)
+```
+
+
+Then we create the respective multipliers for both the Crop and Property
+```{r}
+#=== Creating Crop damage multiplier.
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == ""] <- 0
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "M"] <- 1000000
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "K"] <- 1000
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "m"] <- 1000000
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "B"] <- 1000000000
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "?"] <- 0
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "0"] <- 1
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "k"] <- 1000
+datatoanalyze$CROPDMGMULTIPLIER[datatoanalyze$CROPDMGEXP == "2"] <- 100
+
+#== creating Property Damage Multiplier
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP ==  "K"    ]  <-    1000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "M"     ]   <-  1000000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == ""      ]   <-  0
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "B"     ]   <-  1000000000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "m"     ]   <-  1000000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "+"     ]   <-  0
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "0"     ]   <-  1
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "5"     ]   <-  100000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "6"     ]   <-  1000000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "?"     ]   <-  0
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "4"     ]   <-  10000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "2"     ]   <-  100
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "3"     ]   <-  1000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "h"     ]   <-  100
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "7"     ]   <-  10000000
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "H"     ]   <-  100
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP == "-"     ]   <-  0
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP =="1"     ]   <-  10
+datatoanalyze$PROPDMGMULTIPLIER[datatoanalyze$PROPDMGEXP =="8"     ]   <-  100000000
+```
+
+
+We then generate the Crop damage and Property damage amounts by : multiplying the numeric Crop/Property damage numbers against their respective Crop/Property damage multipliers:  
+
+The mathermatic code for that is given below:  
+```{r}
+datatoanalyze$PROPERTYDMGVAL <- datatoanalyze$PROPDMG * datatoanalyze$PROPDMGMULTIPLIER
+datatoanalyze$CROPDMGVAL <- datatoanalyze$CROPDMG * datatoanalyze$CROPDMGMULTIPLIER
+```
+
+### <span style="color: brown">Results</span>
+
+We now proceed to use the data from Data Processing to answer the following questions:  
+
+**Across the United States, which types of events  are most harmful with respect to population health?**  
+
+```{r}
+# == Plotting out the information for health toll
+#== Check for NAs. in Injusties and Fatalities. There are none.
+sum(as.integer(is.na(datatoanalyze$FATALITIES)))
+sum(as.integer(is.na(datatoanalyze$INJURIES)))
+
+#=== we will combine the injuries and Fatalities into a common variable called healthToll
+datatoanalyze$healthtoll <- datatoanalyze[,"FATALITIES"] + datatoanalyze[,"INJURIES"]
+
+#== we wil look only at subset of rows with healthtoll(FATALITIES+INJURIES) with greather than 0 occurences
+OnlyDataWithhealthToll <- datatoanalyze[datatoanalyze$healthtoll > 0,]
+
+
+
+
+##=== We now group the events and summarize 
+
+groupbyEVTYPE <- group_by(OnlyDataWithhealthToll,EVTYPE)
+groupbyEVTYPE <- summarise_at(groupbyEVTYPE, .vars = c("healthtoll"),sum)%>%arrange(desc(healthtoll))
+
+
+
+##==== Results:
+# Log scale
+ggplot(data = groupbyEVTYPE,aes(x=reorder(EVTYPE, (healthtoll)),y = healthtoll))+geom_bar(stat = "identity",fill = rainbow(n=length(groupbyEVTYPE$EVTYPE)))+coord_flip()+xlab("Events") + ylab("Fatalities/Injuries")+ggtitle("Breakup of Events causing maximum health toll")
+
+```
+
+#### Code breakdown:
+- *Line 1: check the FATALITIES column for NAs.*
+- *Line 2: check the INJURIES column for NAs .*
+- *Line 3: combine the injuries and Fatalities into a common variable called healthToll.*
+- *Line 4: look only at subset of rows with atleast healthtoll of 1 or more.*
+- *Line 5: display table breakups of healhtoll.*
+- *Line 6: group data by their Events.*
+- *Line 7: summarise total healthtoll(INJURIES+FATALITIES) for each Event type.*
+- *Line 8: Do a plot,  see contributors.*
+
+#### <span style="color:red">Inference:<span>  
+
+We infer the following:
+
+- Tornados are the largest contributor to human suffering. They seem to cause the greatest human toll. Approaching 1000000.  
+
+- There is a huge difference in magnitude following which, Storm wind, heat etc occupy the next tier with 18000 human toll
+
+- Everything else falls lower in damage to human beings.
+
+- Conclusion: Tornados seem to be the biggest contributor to human suffering by a very large margin.
+
+
+**Across the United States, which types of events have the greatest economic consequences?**  
+
+```{r}
+OnlyDataWithPropertydmg <- datatoanalyze[datatoanalyze$PROPDMG > 0,]
+groupbyEVTYPE1 <- group_by(OnlyDataWithPropertydmg,EVTYPE)
+groupbyEVTYPE1 <- summarise_at(groupbyEVTYPE1, .vars = c("PROPERTYDMGVAL"), sum)%>%arrange(desc(PROPERTYDMGVAL))
+
+OnlyDataWithCropdmg <- datatoanalyze[datatoanalyze$CROPDMG > 0,]
+groupbyEVTYPE2 <- group_by(OnlyDataWithCropdmg,EVTYPE)
+groupbyEVTYPE2 <- summarise_at(groupbyEVTYPE2, .vars = c("CROPDMGVAL"), sum)%>%arrange(desc(CROPDMGVAL))
+
+
+plot1 <- ggplot(data = groupbyEVTYPE1[1:10,],aes(x=reorder(EVTYPE, (PROPERTYDMGVAL)),y = PROPERTYDMGVAL))+geom_bar(stat = "identity",fill = rainbow(n=length(groupbyEVTYPE1[1:10,]$EVTYPE)))+coord_flip()+xlab("Events") + ylab("Damage")+ggtitle("Top 10 Events for Property Damage")
+plot2 <- ggplot(data = groupbyEVTYPE2[1:10,],aes(x=reorder(EVTYPE, (CROPDMGVAL)),y = CROPDMGVAL))+geom_bar(stat = "identity",fill = rainbow(n=length(groupbyEVTYPE2[1:10,]$EVTYPE)))+coord_flip()+xlab("Events") + ylab("Damage")+ggtitle("Top 10 Events for Crop Damage")
+
+grid.arrange(plot1,plot2, nrow = 2)
+```
+
+
+#### Code breakdown:
+
+- *Line 1: look only at subset of rows with atleast Property damage of 1 or more.*
+- *Line 2: group data by their Events.*
+- *Line 3: summarise total Property damage for each Event type and sort from larges to smallest.*
+- *Line 4: look only at subset of rows with atleast Crop damage of 1 or more.*
+- *Line 5: group data by their Events.*
+- *Line 6: summarise total Crop damage for each Event type and sort from larges to smallest.*
+- *Line 7: generatate the plot for property damage.*
+- *Line 8: generate the plot for crop damage.*
+- *Line 9: print both plots in the same picture.*
+
+#### <span style="color:red">Inference:<span>  
+
+We infer the following:
+
+- **CROP Damage:**
+- Droughts cause the greatest damage to crops, followed by floods and typhoons.
+
+- **PROPERTY Damage:**
+- Floods and typhoons cause the greatest damage to property followed by Tornados.
+
+- Hail equally affects both crops and property
+- Icestorms have a greater impact on crops than they do on property.
+- Tornados damage properties, they seem to have less of an impact on crops
+
+# <span style="color:red">Final Conclusion:<span> 
+ - Droughts are expensive in terms of Crop damage.
+ - Floods and typhoons are expensive in terms of Property damage.
+
+### <span style="color:blue">Tornados are expensive in terms of Property damage (featuring at number3) as well as highly dangerous for human lives.<br><br> Prioritize reducing the damaging effects of Tornados<span> 
+
+
