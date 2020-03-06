@@ -1,0 +1,320 @@
+---
+title: "Exploring the BRFSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+```
+
+### Load data
+
+Make sure your data and R Markdown files are in the same directory. When loaded
+your data file will be called `brfss2013`. Delete this note when before you submit 
+your work. 
+
+```{r load-data}
+load("brfss2013.RData")
+```
+
+
+
+* * *
+
+## Part 1: Data  
+
+### <span style="color: brown">What is this data about?  </span> 
+
+- In 1984 the Center for Disease control (CDC) started a *survey* which is state-based in the US.  
+- The *survey* is called **Behavioral Risk Factor Surveillance System** (BRFSS)  
+- The survey is conducted via landline and cellular telephones.  
+- The survey uses a standardized questionnaire.  
+- The survey is used to collect data among the US population regarding their: risk behavious and preventive health practices that can affect their health status.
+
+### <span style="color: brown">Structure of the survey?  </span> 
+- **Standard Core Questions:** Questions that are asked by every state across the US.  
+- **Rotating Core Questions:** Questions that are asked by all states on an alternate year basis.
+- **Optional Questions:** Optional questions from a standardized set of questions that each state can choose from to include in it's questionnaire.
+- **State-added Questions:** State specific questions that are not common across all the states but specific to that particular state asking them.  
+
+### <span style="color: brown">How to ensure survey is uniform across all of the US?</span>  
+
+In order to ensure uniformity of the survey across all of the US. BRFSS has certain standards that are followed:  
+
+- All states ask the **Standard Core Questions** without modification. This ensures uniform data observation from the survey. Addition of the **Optional Questions** and **State-added Questions** is left to the state.  
+
+- unobrusive electonic monitoring of the interviewers is also done across all states. To ensure uniformity of survey taking across all the states.  
+
+- Clear definition of what constitutes a unit from which the survey is taken: Household.  
+
+### <span style="color: brown">What sampling approach is used in selecting candidates for the survey?</span>  
+
+- The survey is conducted in all states across the US. In this way it covers the whole of the US population in all the states and terrotories. (DC and GUAM, Porto Rico including)  
+
+- Sampling style used is Stratified Sampling: Each state decides to stratify based on any of the following ways: county, public-health district or other sub-geography.
+
+- Inside each Strata, further Stratified Sampling is done based on households with Landlines , household with Cell phones.
+
+- Landlines: Disproportionalte staritified Sampling (DSS) is applied by splitting data into regions with high density landlines vs those with min-density landlines. A ratio of 1:1.5 is followed to ensure, equal representation from regions with mid-density landlines. Further more inside each of the sampled households, one of the occupants of the household is randomly selected, with each occupant of the household having an equally likely chance of getting selected for the survey.
+
+- Therefore at the topmost level we have stratified sampling, with each strata further subjected to stratified sampling, finally simple random sampling is used at the lowermost level to select the subject to be surveyed.
+
+- Cell phones: Every cell phone is considered an indivdual single owner household. And random samples are drawn from a list of cell numbers, where  each cell number has an equal likelihood of being sampled.  
+
+
+### <span style="color: Orange">**Answer : **</span>
+-  <span style="color: Green">**Generalizability** :</span> Since the data is  collected using a survey of randomly selected individuals from stratified sample across the US. We can safely say the survey is generalizable **only** across the US population.  
+
+- <span style="color: Green">**Causality** : </span> The survey is **NOT** useful for causality. As we have not randomly selected and randomly assigned individuals into experimental groups to draw any causual relationships among the variable of the data in which we seek to establish causality.  
+
+- <span style="color: Green">**Potential biases**: </span> There is a chance of bias , due to non-participation of randomly selected individuals. Volunteer bias due to certain segments of individuals in each strata more willing to partiipate than other individuals.
+
+In conclusion the survey is **Generalizable** across the US. Any patterns we observe are **Associative** and we need further controlled experiments to establish **Causality**. There is a possibility of **Participation bias** as well as **Non-response** bias to be introduced into the survey.
+
+
+
+
+
+
+* * *
+
+## Part 2: Research questions
+
+#### <span style="color: Brown">**Research question 1:** </span> 
+<span style="color: Black">*Which has a stronger association with General Health, Income or Exercise?*</span>
+<br>
+
+- I am interested in seeing if any associative relationship exists between income and health, versus exercise and health.
+- This question is of interest to me because. Not everyone is rich and can have access to better healthcare.
+- But everyone can exercise to stay fit. 
+- So it will be intersting to see which has a more stronger associative relationship leading to better health if any.
+
+
+#### <span style="color: Brown">**Research question 2:**</span>  
+<span style="color: Black">*Is there any association between BMI and States ?*</span>
+<br>
+
+- I am interested in finding out, it all States in the US have equal distribution of BMI or it there are any interesting patterns in the data to be observed.
+- This is important because BMI is an excellent indicator of a State's health metric. 
+- States with people in the Obese and Overweight BMI range are overall in an unhealthy category.
+
+#### <span style="color: Brown">**Research question 3:**</span>   
+<span style="color: Black">*Is there an association between Income and Depression ?*</span>
+<br>
+
+- I am interested in seeing if better income has any association with Depression.
+- I find this question really interesting as many rich and famous people commit suicide.
+- So this has made me curious, was there any association with high income that leads to these suicides.
+- This EDA will seek to see if the above line of thinking has any association or no association
+
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+### <span style="color: Green">**Research question 1:** </span>  
+
+### <span style="color: Black">*Which has a stronger association with General Health, Income or Exercise?*</span>
+<br>
+
+### <span style="color: Orange">**Step1 : Load  and Clean up Data for analysis **</span> 
+
+we begin by loading the required libraries; and loading the dataset into memory
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+library(forcats)
+
+load("brfss2013.RData")
+```
+
+We then select the variables of interest: genhlth(Ordinal), income2(Oridnal), exerany2(categorical)  
+Here we have: 2 Ordinal Variables and 1 categorical variable for doing our analysis.
+
+```{r}
+analysis1 <- brfss2013%>%select(c("genhlth","income2","exerany2"))%>%filter(!is.na(genhlth) )
+plothealth <- ggplot(analysis1, aes(x=genhlth))+geom_bar()+xlab("Health")
+plotincome <- ggplot(analysis1, aes(fill = income2,x = income2))+geom_bar(position = "stack")+coord_flip()+xlab("income")
+grid.arrange(plothealth,plotincome,nrow = 2)
+```
+```{r}
+analysis1$income2 <- fct_explicit_na(analysis1$income2, na_level = "NotDisclosed")
+analysis1%>%group_by(income2)%>%summarise(countgp = n(), total = length(analysis1$income2), percentage = (countgp/total)*100 )
+
+```
+
+We see that there is a huge chunk of NotDisclosed **14.46%** , which is one of the levels in the income category.
+As a result we cannot drop it. But we will keep it as a separate category of it's own.
+
+We will now analyze exercise to see if any NAs can be dropped
+```{r}
+analysis1$exerany2 <- as.character(analysis1$exerany2)
+analysis1$exerany2[is.na(analysis1$exerany2)] <- "NotDisclosed"
+analysis1$exerany2 <- as.factor(analysis1$exerany2)
+plotexercis <- ggplot(analysis1, aes(fill = exerany2,x=exerany2))+geom_bar()
+analysis1%>%group_by(exerany2)%>%summarise(countgp = n(), total = length(analysis1$exerany2), percentage = (countgp/total)*100 )
+```
+
+6 percent is NotDisclosed for exercise this is a very small number, hence we can drop it from our analysis.
+
+```{r}
+analysis1 <- analysis1%>%select(c("genhlth","income2","exerany2"))%>%filter(!(exerany2 == "NotDisclosed") )
+plotexercis <- ggplot(analysis1, aes(fill = exerany2,x=exerany2))+geom_bar(position = "stack")+xlab("Exercise")
+grid.arrange(plotexercis,nrow = 1)
+```
+
+### <span style="color: Orange">**Step2 : Exploratory Data Analysis among the variables **</span>
+
+```{r}
+# There seems to be an associative relationship between income and health
+plotincomevshealth <- ggplot(analysis1, aes(fill=genhlth, x = income2))+geom_bar(position = "fill")+xlab("Income")
+
+# There is an associative relationship between exercise and health.
+plotexercisvshealth <- ggplot(analysis1, aes(fill = genhlth,x=exerany2))+geom_bar(position = "fill")+xlab("Exercise")
+
+# Relationship between income and exercise
+plotincomevsexercise<- ggplot(analysis1, aes(fill = exerany2,x=income2))+geom_bar(position = "fill")
+
+#Findings: There is an associative connection between: income&Health, exercise&health, income&exercise.
+# Let us see what the relationship between these 3 would be:
+
+p1 <- plotincomevshealth+facet_grid(.~exerany2)+coord_flip()+ggtitle("Income vs Health")+guides(fill=guide_legend(title="Health Level"))
+p2 <- plotexercisvshealth+facet_grid(.~income2)+labs("Health")+ggtitle("Exercise vs Health")+guides(fill=guide_legend(title="Health Level"))
+grid.arrange(p1,p2, nrow = 2)
+```
+
+### <span style="color: Orange">**Findings:  **</span>  
+
+- **Warning** : Association is not Causation.
+- From Plot: *(Income vs Health)* it can be seen there is an associative relationship between income and health and exericse.
+- As income increases, there is a marked positive increase in health.
+- A interesting observation is: With exercise, there is a greater increase in health benefits. This can be seen from Plot: *(Exercise vs Health)* by the steep difference between those who exercise(Yes) versus those who don't(No).
+- **Therefore, Exercise has a bigger impact on health, compared to income** , the relationship is purely correlational, we need further experiment to formally establish causality.
+
+
+
+### <span style="color: Green">**Research question 2:** </span>  
+
+### <span style="color: Black">*Is there any association between BMI and States ?*</span>
+<br>
+
+### <span style="color: Orange">**Step1 : Load  and Clean up Data for analysis **</span>
+We select the variables of interest: weight, height, marital, X_State and income
+```{r}
+frameofinterest <- brfss2013%>%select(c("weight2","height3","marital","X_state","income2"))
+frameofinterest$marital <- fct_explicit_na(frameofinterest$marital, na_level = "NotDisclosed")
+frameofinterest%>%group_by(marital)%>%summarise(countgp = n(), total = length(frameofinterest$marital), percentage = (countgp/total)*100 )
+
+```
+There are very little NotDisclosed aroung **0.7 %** so we drop them from the marital, category.
+
+```{r}
+frameofinterest <- frameofinterest%>%select(c("weight2","height3","marital","X_state","income2"))%>%filter(!(marital == "NotDisclosed"))
+ggplot(frameofinterest, aes(x=marital))+geom_bar()+coord_flip()
+```
+
+### <span style="color: Orange">**Step2 : Calculate BMI using: Height, Weight variables **</span>
+We nor proceed to calculate the BMI, by using the : height, and weight variables.
+```{r}
+sum(is.na(frameofinterest$weight2)) # no NAS
+sum(is.na(frameofinterest$height3)) # 6670 / 488355 NAS is roughly only 1.3% so we can drop those rows.
+unique(frameofinterest$height3)
+length(frameofinterest$height3)
+
+# We see the strange values starting with 9 are values entered in cms, with 9 to indicate that fact: 9 followed bt cm value.
+
+# we find these values are only 0.3 percent of our reading, so we drop them, instead of spending time processing them.
+
+#Convert Feet to inches
+frameofinterest <- frameofinterest%>%select(c("weight2","height3","marital","X_state","income2"))%>%filter(!is.na(height3))%>%filter(height3 >= 200, height3 <= 711)%>%
+  mutate(inches = height3/100)%>%mutate(inches = gsub("0","",inches))%>%mutate(inches = as.double(inches))%>%mutate(inches = inches*12)
+
+# Now we have values strictly in feet and inches, we proceed to deal with these now.
+frameofinterest <- frameofinterest%>%select(c("weight2","height3","marital","inches","X_state","income2"))%>%mutate(weight2 = as.character(weight2))%>%mutate(weight2 = as.double(weight2))%>%
+  mutate(bmi = (703*weight2)/(inches*inches))%>%filter(!is.na(bmi))
+#dropping NAs as they constitute only 3.2 percent of the data.
+
+frameofinterest$income2 <- fct_explicit_na(frameofinterest$income2, na_level = "NotDisclosed")
+
+frameofinterest$bmicat <- frameofinterest$bmi
+frameofinterest$bmicat[frameofinterest$bmicat < 18.5] <- 0
+frameofinterest$bmicat[frameofinterest$bmicat >= 18.5 & frameofinterest$bmicat < 25] <- 1
+frameofinterest$bmicat[frameofinterest$bmicat >= 25 & frameofinterest$bmicat < 30] <- 2
+frameofinterest$bmicat[frameofinterest$bmicat >= 30] <- 3
+
+frameofinterest$bmicat <- as.character(frameofinterest$bmicat)
+
+frameofinterest$bmicat[frameofinterest$bmicat == "0"] <- "Underweight"
+frameofinterest$bmicat[frameofinterest$bmicat == "1"] <- "Normalweight"
+frameofinterest$bmicat[frameofinterest$bmicat == "2"] <- "Overweight"
+frameofinterest$bmicat[frameofinterest$bmicat == "3"] <- "Obese"
+```
+
+### <span style="color: Orange">**Step3 : Exploratory Data Analysis BMI versus States **</span>
+```{r}
+#mean bmi versus median BMi per state
+sBMI <- frameofinterest%>%group_by(X_state)%>%summarise(meanBMIt = mean(bmi),medianBMI = median(bmi))
+#ggplot(sBMI,aes(x= medianBMI,y=meanBMIt, col=X_state))+geom_point()+facet_wrap(~bmicat)
+
+ggplot(sBMI,aes(x= medianBMI,y=meanBMIt, label=X_state))+geom_point()+geom_text(aes(label=X_state),hjust=1, vjust=0)
+```
+
+### <span style="color: Orange">**Findings:  **</span> 
+
+- **Warning** : Association is not Causation.
+- From the scatter plot of median(BMI) versus the mean(BMI), it can be seen that there are 2 noticable outlier states: Texas and NewYork.
+
+- For both these states, the Average/Mean BMI is much much larger than the Median BMI value.
+- This implies a right skew in the distribution, and there must be some really super obese individuals, in both these states skewing the data to the right.
+- We will have to do greater investigation, or track down the really obese individuals and study their circumstances, to see if this is a real problem in Texas and Newyork.
+
+### <span style="color: Green">**Research question 2:** </span>  
+
+### <span style="color: Black">*Is there any association between Income and Depression(MentalHealth) ?*</span>
+<br>
+
+### <span style="color: Orange">**Step1 : Load  and Clean up Data for analysis **</span>
+
+We load the data , and clean it up, handling any NAs, by refactoring them
+```{r}
+analysis3 <- brfss2013%>%select(c("income2","menthlth"))
+analysis3$income2 <- fct_explicit_na(analysis3$income2, na_level = "NotDisclosed")
+analysis3$menthlth <- as.factor(analysis3$menthlth)
+analysis3$menthlth <- fct_explicit_na(analysis3$menthlth, na_level = "Not Shared")
+```
+
+We print out a consicse summary table, of what we plan to plot out.
+We have grouped the days based on income, and this is what will be plotted out
+
+```{r}
+table(analysis3)
+
+```
+
+### <span style="color: Orange">**Step2 : Exploratory Data Analysis between income and Depression **</span>
+
+```{r}
+ggplot(analysis3, aes(fill = menthlth,x=income2))+geom_bar(position = "fill")+coord_flip()+ggtitle("Income Vs Days with Depression")+xlab("income")+ylab("Depression days")+guides(fill=guide_legend(title="Days"))
+
+```
+
+### <span style="color: Orange">**Findings :**</span> 
+
+- **Warning** : Association is not Causation.
+- It can be seen that as income decreases, the number of days a person has poor mental health and is depressed increases.
+- This seems to imply an association between mental health and income.
+- We were trying to answet questions as to why the rich and famous commit suicide, but it looks like the general trend suggests that more money means a better state of mental/depression free life.
+- Celebrities maybe outliers. Who cannot be accounted for by this plot.
+- It could even be said there might be a confounding variable that has established this plot that we observe.
+
