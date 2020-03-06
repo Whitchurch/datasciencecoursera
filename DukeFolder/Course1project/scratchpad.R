@@ -174,7 +174,7 @@ analysis3$menthlth <- fct_explicit_na(analysis3$menthlth, na_level = "Not Shared
 
 table(analysis3)
 
-ggplot(analysis3, aes(fill = menthlth,x=income2))+geom_bar(position = "fill")+coord_flip()+ggtitle("Income Vs Days with Bad MentalHealth")+xlab("income")+ylab("Bad days")++guides(fill=guide_legend(title="Bad days"))
+ggplot(analysis3, aes(fill = menthlth,x=income2))+geom_bar(position = "fill")+coord_flip()+ggtitle("Income Vs Days with Depression")+xlab("income")+ylab("Depression days")++guides(fill=guide_legend(title="Days"))
 
 
 

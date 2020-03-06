@@ -39,6 +39,7 @@ table(sim_basket)
 independent_shooter_streak <- calc_streak(sim_basket)
 shooter_plpot <- ggplot(data = independent_shooter_streak, aes(x = length))+geom_histogram()
 quantile(independent_shooter_streak$length)
-summarise(independent_shooter_streak,meanstread = mean(length), medianstreak = median(length))
+summarise(independent_shooter_streak,meanstread = mean(length), medianstreak = median(length), ssd = sd(length))
 
 grid.arrange(kobe_plot,shooter_plpot, nrow = 2)
+
