@@ -232,18 +232,6 @@ ggplot(frameofinterest, aes(x=marital))+geom_bar()+coord_flip()
 ```
 
 ### <span style="color: Orange">**Step2 : Calculate BMI using: Height, Weight variables **</span>
-We nor proceed to calculate the BMI, by using the : height, and weight variables. 
-
-- The formula for BMI is : (708 x weight in lbs)/(height in inches ^ 2)  
-- Lines 1- 4 are for calculating the number of NAs. We found that only 1.3% of heights were NAs
-- Line 5 selects weight, height, marital, State and income, it excludes, those 1.3% of the rows 6670/488355 that contain NAs for heights. It also only filters hwights between 300 and 711. As other heights that have suffixes of 9xxx have units in cms.
-- To make analysis easier we choose to ignore those, and honly focus on heights between 300 and 711 that are in units of feet.
-- To convert the heights, we divide by 100 and then grep and remove 0's.
-- for example: 505 becomes 5.05 (multiplying by 100) transforming to 5.5(after removing the zero) represeinting 5 feet 5 inches by these sequence of steps.
-- The final step is to multiply this value by 12 to convert it from feet to inches.
-- 5.5 feet becomes 66 inches. 
-- we then calculate the BMI using the formula mentioned above.
-- Finally we take the resulting BMIs, and group them into: underweight, NormalWwight, Overweight and Obese categories.
 
 ```{r}
 sum(is.na(frameofinterest$weight2)) # no NAS
@@ -279,6 +267,19 @@ frameofinterest$bmicat[frameofinterest$bmicat == "1"] <- "Normalweight"
 frameofinterest$bmicat[frameofinterest$bmicat == "2"] <- "Overweight"
 frameofinterest$bmicat[frameofinterest$bmicat == "3"] <- "Obese"
 ```
+We nor proceed to calculate the BMI, by using the : height, and weight variables. 
+
+- The formula for BMI is : (708 x weight in lbs)/(height in inches ^ 2)  
+- Lines 1- 4 are for calculating the number of NAs. We found that only 1.3% of heights were NAs
+- Line 5 selects weight, height, marital, State and income, it excludes, those 1.3% of the rows 6670/488355 that contain NAs for heights. It also only filters hwights between 300 and 711. As other heights that have suffixes of 9xxx have units in cms.
+- To make analysis easier we choose to ignore those, and honly focus on heights between 300 and 711 that are in units of feet.
+- To convert the heights, we divide by 100 and then grep and remove 0's.
+- for example: 505 becomes 5.05 (multiplying by 100) transforming to 5.5(after removing the zero) represeinting 5 feet 5 inches by these sequence of steps.
+- The final step is to multiply this value by 12 to convert it from feet to inches.
+- 5.5 feet becomes 66 inches. 
+- we then calculate the BMI using the formula mentioned above.
+- Finally we take the resulting BMIs, and group them into: underweight, NormalWwight, Overweight and Obese categories.
+
 
 ### <span style="color: Orange">**Step3 : Exploratory Data Analysis BMI versus States **</span>
 - To see if there are any states with BMI getting skewed.We plot the Mean BMI versus the Median BMI. 
