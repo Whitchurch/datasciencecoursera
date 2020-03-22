@@ -73,7 +73,7 @@ inference(y = mage, x = whitemom, data = nc, statistic = "mean", type = "ht", nu
           alternative = "twosided", method = "theoretical")
 
 #Calculate onfidence interval
-inference(y = mage, x = whitemom, data = nc, statistic = "mean", type = "ci", null = 0, 
+inference(y = mage, x = whitemom, data = nc, statistic = "mean", type = "ci", 
           alternative = "twosided", method = "theoretical")
 
 #See if there is difference in mean age between white and non-white mons
