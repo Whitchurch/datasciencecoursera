@@ -41,7 +41,7 @@ nc %>%
 # mean < median, so clearily both are left skewed. So it is false to claim both distributins are right skewed.
 
 #Run a hypothesis test to see if there is any difference between mean weights of babies born to smokers versus non-smoker moms
-inference(y = weight, x = habit, data = nc, statistic = "mean", type = "ci", null = 0, 
+inference(y = weight, x = habit, data = nc, statistic = "mean", type = "ht", null = 0, 
           alternative = "twosided", method = "theoretical")
 
 # Get the 99% CI for average length of pregnanices weeks
