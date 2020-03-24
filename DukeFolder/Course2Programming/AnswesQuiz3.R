@@ -84,3 +84,6 @@ ggplot(data = nc, aes(x = whitemom, y = mage ))+geom_boxplot()
 
 #Conclusion: There is overwhelimg evidence that race(white vs non-white) plays a huge role, so there is a difference between 
 # mean ages of white and non-white ewomen , non-white women get pregnant earlier.
+
+paul = factor(c(rep("yes",18),rep("no",6)),levels = c("yes","no"))
+inference(data = paul, statistic ="proportion", type = "ht", method = "simulation", success = "yes", null = 0, alternative = "twosided" )
