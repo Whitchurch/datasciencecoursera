@@ -18,7 +18,7 @@ days <- seq(1:length(growthrate))
 
 dataTrend <- data.frame(GrowthRate = growthrate, Days = days)
 print(dataTrend)
-ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +
+ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("Growth Factor Corona cases in Arizona")+
   geom_line()+
   geom_point()
 
