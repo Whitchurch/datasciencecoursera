@@ -27,3 +27,21 @@ ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("Growth Fact
 # 
 # A growth factor above 1 indicates an increase, whereas one which remains between 0 and 1 it is a sign of decline, with the quantity eventually becoming zero, 
 #whereas a growth factor constantly above 1 could signal exponential growth
+
+
+#Plot current cases versus predicted cased by growthfactor
+days <- seq(1:length(absolutenumbers))
+growthrate <- append(growthrate, c(1,1),after = 0)
+dataOriginal <- data.frame(Cases = rev(absolutenumbers), Days = days,growthrate = growthrate ,Prediction = growthrate * rev(absolutenumbers))
+ggplot() +
+  geom_line(data=dataOriginal, aes(x=Days, y=Cases),color = "Red")+labs(title="Cases Vs Predicted", y="Cases", x="Days")+
+  geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+  
+  plot(dataOriginal$Days,dataOriginal$Cases,col="Red", type = "l", ylab = "Cases", xlab = "")
+  
+  # use points to add on to the plot that is rendered
+  points(dataOriginal$Days+1,dataOriginal$Prediction,col="Blue", type = "l")
+
+  # add in the legends for the plot
+  legend("bottomright",legend = c("Cases","Prediction"),col = c("red","blue"),lty = 1,bty = "n")
