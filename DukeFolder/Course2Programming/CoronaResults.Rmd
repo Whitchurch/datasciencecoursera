@@ -1,7 +1,7 @@
 ---
-title: "Arizona/US/India Corona Trends-30th March 2020 with tomorrow's prediction"
+title: "Arizona/US/India Corona Trends-31st March 2020 with tomorrow's prediction"
 author: "Whitchurch Muthumani"
-date: "3/30/2020"
+date: "3/31/2020"
 output: html_document;pdf_document
 ---
 
@@ -61,7 +61,7 @@ DoublingRate <- function(absoluteNumbers)
 
 ```{r include=FALSE}
 #Arizona
-absolutenumbers <- c(1157,919,773,665,508,401,326,234,152,104,71,44,28,20,18,12)
+absolutenumbers <- c(1289,1157,919,773,665,508,401,326,234,152,104,71,44,28,20,18,12)
 
 #America
 #absolutenumbers <- c(101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
@@ -119,6 +119,8 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
+#Median growth rate trend 
+p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "Arizona Median Growth Rate")
 
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
@@ -165,6 +167,7 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p7)
 ```
 
 ### Results:
@@ -234,7 +237,7 @@ DoublingRate <- function(absoluteNumbers)
 #absolutenumbers <- c(773,665,508,401,326,234,152,104,71,44,28,20,18,12)
 
 #America
-absolutenumbers <- c(145.369*1000,133.094*1000,123.578*1000,101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
+absolutenumbers <- c(176.518*1000,145.369*1000,133.094*1000,123.578*1000,101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
 ```
 
 ```{r include=FALSE,message=FALSE}
@@ -289,6 +292,10 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
+#Median growth rate trend 
+p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "US Median Growth Rate")
+
+
 
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
@@ -335,6 +342,7 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p7)
 ```
 
 ### Results:
@@ -402,7 +410,7 @@ DoublingRate <- function(absoluteNumbers)
 #absolutenumbers <- c(773,665,508,401,326,234,152,104,71,44,28,20,18,12)
 
 #America
-absolutenumbers <- c(1071,1024,987,887,727,657,536,499,396,332,249,194,169,143,129,114,100,82,74,62,62,47,40,34,31,30,29,7,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
+absolutenumbers <- c(1251,1071,1024,987,887,727,657,536,499,396,332,249,194,169,143,129,114,100,82,74,62,62,47,40,34,31,30,29,7,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
 ```
 
 ```{r include=FALSE,message=FALSE}
@@ -457,6 +465,10 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
+#Median growth rate trend 
+p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "India Median Growth Rate")
+
+
 
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
@@ -503,6 +515,7 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p7)
 ```
 
 ### Results:

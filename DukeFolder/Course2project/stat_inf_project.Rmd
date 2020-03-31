@@ -1,0 +1,100 @@
+---
+title: "Statistical inference with the GSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+library(statsr)
+```
+
+### Load data
+
+Make sure your data and R Markdown files are in the same directory. When loaded
+your data file will be called `gss`. Delete this note when before you submit 
+your work. 
+
+```{r load-data}
+load("gss.Rdata")
+
+```
+
+
+
+* * *
+
+## Part 1: Data
+### <span style="color: brown">What is this data about?  </span> 
+- The GSS survey has been conducted since the year 1972.
+- Since 1972, the General Social Survey (GSS) has been monitoring societal change and studying the growing complexity of American society. The GSS aims to gather data on contemporary American society in order to monitor and explain trends and constants in attitudes, behaviors, and attributes; to examine the structure and functioning of society in general as well as the role played by relevant subgroups;.
+- GSS questions cover a diverse range of issues including national spending priorities, marijuana use, crime and punishment, race relations, quality of life, confidence in institutions, and sexual behavior.
+
+### <span style="color: brown">Notable changes to the survey</span> 
+#### <span style="color: red">GSS frequency of survey: </span> 
+- The survey used to be conducted annual from 1972-1994. Due to changes in funding, The surves has then been donducted bi-annually from 1996, 1998,2002 and so on, till date.
+- The method of taking the survey has evolved considerable over time. And currently circa 2020:
+#### <span style="color: red">GSS Administration: </span> 
+- The vast majority of GSS data is obtained in face-to-face interviews. 
+- Computer-assisted personal interviewing (CAPI) began in the 2002 GSS. 
+- Under some conditions when it has proved difficult to arrange an in-person interview with a sampled respondent, GSS interviews may be conducted by telephone.
+
+### <span style="color: brown">Structure of the survey?</span> 
+- The items appearing on the suervey are of 3 types: 
+- Permanent questions that occur in each and every survey
+- Rotating questions that appear in 2 out of 3 surveys.
+
+#### <span style="color: red">Sampling used in the GSS: </span> 
+- Around 1500 people were sampled annual from 1972 - 1992. Since 1994 two-samples of eize 1500 each are surveyed. However, the survey is conducted once every 2 years. There has been no oversampling done since 1994.
+- Modified probablilty sampling used from 1972-1974 (random sampling).
+- At the top most level, PSU (Primary Sampling Units) are: Metropolitan and non-Metropolitan areas. These are stratified, based on region, age and race before selection.
+- Within the PSU, they are broken down into :Block Groups and Enumeration Districts. the BG and ED were stratified according to race and income before selection.
+- The third stage of selection is the blocks, they had probablites assigned based on block size before the selection.
+- Inside the selected blocks, the average cluster size is 5 respondents per cluster.
+- So we have a sampling approach that uses: Stratified sampling at the PSU level -> Stratifies sampling at the BG and ED level -> selection of blocks by probablitly based on size -> finally we select clusters with (5 respondents) in a cluster.
+
+#### <span style="color: red">Generalizabilty concerns with the GSS survey: </span> 
+- The survey has been restricted only to the English speaking population of the US from: 1972- 2004.
+- From 2006 spanish speakers were included in the survey.
+- So , if a person knew neither English nor Spanish, at the moment, it looks like the survey does not cover those demographics. This seems to present a blind spot, that makes the survey not inclusive of the whole US population.
+
+### <span style="color: Orange">**Answer : **</span>
+-  <span style="color: Green">**Generalizability** :</span> Since the data is  collected using a survey of randomly selected Enghlish speaking and Spanish speaking individuals from stratified sample at the PSU -> BG level and finally cluster samping at the lowest level. across the US. We can safely say the survey is generalizable **only** across the English/Spanish speaking US population.  
+
+- <span style="color: Green">**Causality** : </span> The survey is **NOT** useful for causality. As we have not randomly selected and randomly assigned individuals into experimental groups to draw any causual relationships among the variable of the data in which we seek to establish causality.  
+
+- <span style="color: Green">**Potential biases**: </span> There is a chance of participation bias , due to non-participation of randomly selected individuals, non-participation of Non-English and Non-Spanish speakers. Volunteer bias due to certain segments of individuals in each strata more willing to partiipate than other individuals.
+
+In conclusion the survey is **Generalizable** across the English/Spanish US population. Any patterns we observe are **Associative** and we need further controlled experiments to establish **Causality**. There is a possibility of **Participation bias** as well as **Non-response** bias to be introduced into the survey.
+
+* * *
+
+## Part 2: Research question
+#### <span style="color: Brown">**Is there a relationship between gun-ownership, income and race ?** </span> 
+- I am really interested in exploring the relationship between gun-ownership and income
+- I am also interested in seeing if gun-ownership varies by race across the US.
+- This question is of personal relevance to me, as many law-enforcement officers in my part of the US lose their lives to gun-violence. Knowing if there is a relationship between gun-ownership to: poverty and race will give a better idea how best law-enforcement can safely approach hot-spot areas where it could be inferred that guns are more often to be found. 
+
+* * *
+
+## Part 3: Exploratory data analysis
+```{r}
+
+```
+
+
+* * *
+
+## Part 4: Inference
+
+NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
+button (green button with orange arrow) above. Make sure that your code is visible
+in the project you submit. Delete this note when before you submit your work.
