@@ -1,0 +1,517 @@
+---
+title: "Arizona/US/India Corona Trends-30th March 2020 with tomorrow's prediction"
+author: "Whitchurch Muthumani"
+date: "3/30/2020"
+output: html_document;pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Arizona Corona Dashboard
+
+```{r include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+
+coronaGrowth <- function(absoluteNumbers){
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absoluteNumbers[i+1]-absoluteNumbers[i+2])  
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))
+}
+
+DailyGrowthRate <- function(absoluteNumbers)
+{
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]/absoluteNumbers[i+1]))-1 
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))  
+}
+
+DoublingRate <- function(absoluteNumbers)
+{
+  doublingrRate <- NULL
+  cumsum <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    
+    doublingrRate[i] <- (70/(absoluteNumbers[i]*100))
+    
+  }
+  return ((doublingrRate))  
+}
+
+```
+
+
+```{r include=FALSE}
+#Arizona
+absolutenumbers <- c(1157,919,773,665,508,401,326,234,152,104,71,44,28,20,18,12)
+
+#America
+#absolutenumbers <- c(101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
+```
+
+```{r include=FALSE,message=FALSE}
+growthrate <- na.exclude(coronaGrowth(absolutenumbers))
+days <- seq(1:length(growthrate))
+dataTrend <- data.frame(GrowthRate = growthrate,Days = days)
+print(dataTrend)
+p1 <- ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("Arizona: Rate of change in Growth Rate")+
+  geom_line()+
+  geom_point()
+
+print(dataTrend)
+#print(dataTrend1)
+
+
+
+
+growthrate1 <- na.exclude(DailyGrowthRate(absolutenumbers))
+doublingrate1 <- na.exclude(DoublingRate(growthrate1))
+days1 <- seq(1:length(growthrate1))
+dataTrend1 <- data.frame(GrowthRate = growthrate1,Days = days1,doublinrRate = doublingrate1)
+print(dataTrend1)
+multiplier <- tail(dataTrend1, n = 1)
+pred_val <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+
+p2 <- ggplot(data=dataTrend1, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("Arizona: Growth Rate")+
+  geom_line()+
+  geom_point()
+
+days <- seq(1:length(absolutenumbers))
+growthrate <- append(growthrate, c(1,1),after = 0)
+dataOriginal <- data.frame(Cases = rev(absolutenumbers), Days = days)
+p3<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=Cases,),color = "Red")+labs(title="Arizona: Daily Cases", y="Cases", x="Days")
+
+p3_log<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=log2(Cases)),color = "Red")+labs(title="Arizona: Daily Cases", y="Cases", x="Days")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+
+
+# Analyze growth rate to get interval of values
+summary(dataTrend1$GrowthRate)
+dataTrend1%>%select("GrowthRate")%>%summarise(meanGR = mean(GrowthRate), medianGR = median(GrowthRate), sdGR = sd(GrowthRate))
+p4 <- ggplot(data = dataTrend1, aes(x = GrowthRate))+ggtitle("Histogram of GrowthRate")+geom_histogram(binwidth = 0.01)
+
+
+#Analyze the doubling rate
+p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "Red")+labs(title="Doubling Rate in days", y="Days to double", x ="per day estimate")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+#Scatter plor of Growthrate versus Doubling Rate
+p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
+
+
+#Confidence Interval for mean population GrowthRate:
+meanGR = mean(dataTrend1$GrowthRate)
+sdGR = sd(dataTrend1$GrowthRate)
+
+uppperlimitGR= meanGR+sdGR
+lowerlimitGR = meanGR-sdGR
+
+#Predictions based on: Current Growth Rate, MeanGrowth Rate, Upper GrowthRate, Lower GrowthRate
+pred_val_Current <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+pred_val_MeanGR <- (head(absolutenumbers, n = 1)*meanGR)+head(absolutenumbers, n = 1)
+pred_val_upperGR <- (head(absolutenumbers, n = 1)*uppperlimitGR)+head(absolutenumbers, n = 1)
+pred_val_lowerGR <- (head(absolutenumbers, n = 1)*lowerlimitGR)+head(absolutenumbers, n = 1)
+
+print("Current GR:")
+print(multiplier[,"GrowthRate"])
+print(pred_val_Current)
+
+print("Mean GR:")
+print(meanGR)
+print(pred_val_MeanGR)
+
+print("Upperlimit GR:")
+print(uppperlimitGR)
+print(pred_val_upperGR)
+
+print("Lowerlimit GR:")
+print(lowerlimitGR)
+print(pred_val_lowerGR)
+
+#Doubling rate:-
+DRCurrent <- round(70/(meanGR*100),digits = 0)
+DRMedian <- round(70/(median(dataTrend1$GrowthRate)*100),digits = 0)
+latestDRCurrent <- round(tail(dataTrend1$doublinrRate,n=1),digits = 0)
+
+```
+
+```{r echo=FALSE,warning=FALSE}
+#grid.arrange(p3,p3_log,p1,p2,p4,p5,p6,nrow = 4, ncol = 2)
+print(p3)
+print(p3_log)
+print(p1)
+print(p2)
+print(p4)
+print(p5)
+print(p6)
+```
+
+### Results:
+- Tomorrows predicted case number is between **`r pred_val_Current`** and **`r pred_val_MeanGR`** cases.
+- Current doubling rate is **`r latestDRCurrent` days**
+- Mean doubling rate, i.e number of cases doubles every **`r DRCurrent` days**.
+- Median doubling rate, i.e number of cases doubles every **`r DRMedian` days**.
+- Latest Observed Growth Rate **`r multiplier[,"GrowthRate"]*100`** percent.
+- Mean Growth Rate: **`r meanGR*100`** percent.
+- Median Growth Rate: **`r median(dataTrend1$GrowthRate)*100`** percent.
+- Standard deviation: +/- **`r sdGR*100`**.
+
+
+
+### US Corona Dashboard
+
+```{r include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+
+coronaGrowth <- function(absoluteNumbers){
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absoluteNumbers[i+1]-absoluteNumbers[i+2])  
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))
+}
+
+DailyGrowthRate <- function(absoluteNumbers)
+{
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]/absoluteNumbers[i+1]))-1 
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))  
+}
+
+DoublingRate <- function(absoluteNumbers)
+{
+  doublingrRate <- NULL
+  cumsum <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    
+    doublingrRate[i] <- (70/(absoluteNumbers[i]*100))
+    
+  }
+  return ((doublingrRate))  
+}
+
+```
+
+
+```{r include=FALSE}
+#Arizona
+#absolutenumbers <- c(773,665,508,401,326,234,152,104,71,44,28,20,18,12)
+
+#America
+absolutenumbers <- c(145.369*1000,133.094*1000,123.578*1000,101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
+```
+
+```{r include=FALSE,message=FALSE}
+growthrate <- na.exclude(coronaGrowth(absolutenumbers))
+days <- seq(1:length(growthrate))
+dataTrend <- data.frame(GrowthRate = growthrate,Days = days)
+print(dataTrend)
+p1 <- ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("US: Rate of change in Growth Rate")+
+  geom_line()+
+  geom_point()
+
+print(dataTrend)
+#print(dataTrend1)
+
+
+
+
+growthrate1 <- na.exclude(DailyGrowthRate(absolutenumbers))
+doublingrate1 <- na.exclude(DoublingRate(growthrate1))
+days1 <- seq(1:length(growthrate1))
+dataTrend1 <- data.frame(GrowthRate = growthrate1,Days = days1,doublinrRate = doublingrate1)
+print(dataTrend1)
+multiplier <- tail(dataTrend1, n = 1)
+pred_val <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+
+p2 <- ggplot(data=dataTrend1, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("US: Growth Rate")+
+  geom_line()+
+  geom_point()
+
+days <- seq(1:length(absolutenumbers))
+growthrate <- append(growthrate, c(1,1),after = 0)
+dataOriginal <- data.frame(Cases = rev(absolutenumbers), Days = days)
+p3<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=Cases,),color = "Red")+labs(title="US: Daily Cases", y="Cases", x="Days")
+
+p3_log<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=log2(Cases)),color = "Red")+labs(title="US: Daily Cases", y="Cases", x="Days")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+
+
+# Analyze growth rate to get interval of values
+summary(dataTrend1$GrowthRate)
+dataTrend1%>%select("GrowthRate")%>%summarise(meanGR = mean(GrowthRate), medianGR = median(GrowthRate), sdGR = sd(GrowthRate))
+p4 <- ggplot(data = dataTrend1, aes(x = GrowthRate))+ggtitle("Histogram of GrowthRate")+geom_histogram(binwidth = 0.01)
+
+
+#Analyze the doubling rate
+p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "Red")+labs(title="Doubling Rate in days", y="Days to double", x ="per day estimate")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+#Scatter plor of Growthrate versus Doubling Rate
+p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
+
+
+#Confidence Interval for mean population GrowthRate:
+meanGR = mean(dataTrend1$GrowthRate)
+sdGR = sd(dataTrend1$GrowthRate)
+
+uppperlimitGR= meanGR+sdGR
+lowerlimitGR = meanGR-sdGR
+
+#Predictions based on: Current Growth Rate, MeanGrowth Rate, Upper GrowthRate, Lower GrowthRate
+pred_val_Current <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+pred_val_MeanGR <- (head(absolutenumbers, n = 1)*meanGR)+head(absolutenumbers, n = 1)
+pred_val_upperGR <- (head(absolutenumbers, n = 1)*uppperlimitGR)+head(absolutenumbers, n = 1)
+pred_val_lowerGR <- (head(absolutenumbers, n = 1)*lowerlimitGR)+head(absolutenumbers, n = 1)
+
+print("Current GR:")
+print(multiplier[,"GrowthRate"])
+print(pred_val_Current)
+
+print("Mean GR:")
+print(meanGR)
+print(pred_val_MeanGR)
+
+print("Upperlimit GR:")
+print(uppperlimitGR)
+print(pred_val_upperGR)
+
+print("Lowerlimit GR:")
+print(lowerlimitGR)
+print(pred_val_lowerGR)
+
+#Doubling rate:-
+DRCurrent <- round(70/(meanGR*100),digits = 0)
+DRMedian <- round(70/(median(dataTrend1$GrowthRate)*100),digits = 0)
+latestDRCurrent <- round(tail(dataTrend1$doublinrRate,n=1),digits = 0)
+
+```
+
+```{r echo=FALSE,warning=FALSE}
+#grid.arrange(p3,p3_log,p1,p2,p4,p5,p6,nrow = 4, ncol = 2)
+print(p3)
+print(p3_log)
+print(p1)
+print(p2)
+print(p4)
+print(p5)
+print(p6)
+```
+
+### Results:
+- Tomorrows predicted case number is between **`r pred_val_Current`** and **`r pred_val_MeanGR`** cases.
+- Current doubling rate is **`r latestDRCurrent` days**
+- Mean doubling rate, i.e number of cases doubles every **`r DRCurrent` days**.
+- Median doubling rate, i.e number of cases doubles every **`r DRMedian` days**.
+- Latest Observed Growth Rate **`r multiplier[,"GrowthRate"]*100`** percent.
+- Mean Growth Rate: **`r meanGR*100`** percent.
+- Median Growth Rate: **`r median(dataTrend1$GrowthRate)*100`** percent.
+- Standard deviation: +/- **`r sdGR*100`**.
+
+### India Corona Dashboard
+
+```{r include=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+
+coronaGrowth <- function(absoluteNumbers){
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absoluteNumbers[i+1]-absoluteNumbers[i+2])  
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))
+}
+
+DailyGrowthRate <- function(absoluteNumbers)
+{
+  growthfactor <- NULL
+  absgrowth <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    #print((absoluteNumbers[i]-absoluteNumbers[i+1]/absoluteNumbers[i+1])/absoluteNumbers[i+1])
+    growthfactor[i] <- ((absoluteNumbers[i]/absoluteNumbers[i+1]))-1 
+    #growthfactor[i] <- ((absoluteNumbers[i]-absoluteNumbers[i+1]))/(absolutenumbers[i])
+  }
+  
+  return (rev(growthfactor))  
+}
+
+DoublingRate <- function(absoluteNumbers)
+{
+  doublingrRate <- NULL
+  cumsum <- NULL
+  for(i in 1:length(absoluteNumbers))
+  {
+    
+    doublingrRate[i] <- (70/(absoluteNumbers[i]*100))
+    
+  }
+  return ((doublingrRate))  
+}
+
+```
+
+
+```{r include=FALSE}
+#Arizona
+#absolutenumbers <- c(773,665,508,401,326,234,152,104,71,44,28,20,18,12)
+
+#America
+absolutenumbers <- c(1071,1024,987,887,727,657,536,499,396,332,249,194,169,143,129,114,100,82,74,62,62,47,40,34,31,30,29,7,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
+```
+
+```{r include=FALSE,message=FALSE}
+growthrate <- na.exclude(coronaGrowth(absolutenumbers))
+days <- seq(1:length(growthrate))
+dataTrend <- data.frame(GrowthRate = growthrate,Days = days)
+print(dataTrend)
+p1 <- ggplot(data=dataTrend, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("US: Rate of change in Growth Rate")+
+  geom_line()+
+  geom_point()
+
+print(dataTrend)
+#print(dataTrend1)
+
+
+
+
+growthrate1 <- na.exclude(DailyGrowthRate(absolutenumbers))
+doublingrate1 <- na.exclude(DoublingRate(growthrate1))
+days1 <- seq(1:length(growthrate1))
+dataTrend1 <- data.frame(GrowthRate = growthrate1,Days = days1,doublinrRate = doublingrate1)
+print(dataTrend1)
+multiplier <- tail(dataTrend1, n = 1)
+pred_val <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+
+p2 <- ggplot(data=dataTrend1, aes(x=Days, y=GrowthRate, group=1)) +ggtitle("India: Growth Rate")+
+  geom_line()+
+  geom_point()
+
+days <- seq(1:length(absolutenumbers))
+growthrate <- append(growthrate, c(1,1),after = 0)
+dataOriginal <- data.frame(Cases = rev(absolutenumbers), Days = days)
+p3<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=Cases,),color = "Red")+labs(title="India: Daily Cases", y="Cases", x="Days")
+
+p3_log<- ggplot() +geom_line(data=dataOriginal, aes(x=Days, y=log2(Cases)),color = "Red")+labs(title="India: Daily Cases", y="Cases", x="Days")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+
+
+# Analyze growth rate to get interval of values
+summary(dataTrend1$GrowthRate)
+dataTrend1%>%select("GrowthRate")%>%summarise(meanGR = mean(GrowthRate), medianGR = median(GrowthRate), sdGR = sd(GrowthRate))
+p4 <- ggplot(data = dataTrend1, aes(x = GrowthRate))+ggtitle("Histogram of GrowthRate")+geom_histogram(binwidth = 0.01)
+
+
+#Analyze the doubling rate
+p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "Red")+labs(title="Doubling Rate in days", y="Days to double", x ="per day estimate")+
+  #geom_line(data=dataOriginal, aes(x=Days+1, y=Prediction),color = "Blue")
+  geom_point()
+
+#Scatter plor of Growthrate versus Doubling Rate
+p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
+
+
+#Confidence Interval for mean population GrowthRate:
+meanGR = mean(dataTrend1$GrowthRate)
+sdGR = sd(dataTrend1$GrowthRate)
+
+uppperlimitGR= meanGR+sdGR
+lowerlimitGR = meanGR-sdGR
+
+#Predictions based on: Current Growth Rate, MeanGrowth Rate, Upper GrowthRate, Lower GrowthRate
+pred_val_Current <- (head(absolutenumbers, n = 1)*multiplier[,"GrowthRate"])+head(absolutenumbers, n = 1)
+pred_val_MeanGR <- (head(absolutenumbers, n = 1)*meanGR)+head(absolutenumbers, n = 1)
+pred_val_upperGR <- (head(absolutenumbers, n = 1)*uppperlimitGR)+head(absolutenumbers, n = 1)
+pred_val_lowerGR <- (head(absolutenumbers, n = 1)*lowerlimitGR)+head(absolutenumbers, n = 1)
+
+print("Current GR:")
+print(multiplier[,"GrowthRate"])
+print(pred_val_Current)
+
+print("Mean GR:")
+print(meanGR)
+print(pred_val_MeanGR)
+
+print("Upperlimit GR:")
+print(uppperlimitGR)
+print(pred_val_upperGR)
+
+print("Lowerlimit GR:")
+print(lowerlimitGR)
+print(pred_val_lowerGR)
+
+#Doubling rate:-
+DRCurrent <- round(70/(meanGR*100),digits = 0)
+DRMedian <- round(70/(median(dataTrend1$GrowthRate)*100),digits = 0)
+latestDRCurrent <- round(tail(dataTrend1$doublinrRate,n=1),digits = 0)
+
+```
+
+```{r echo=FALSE,warning=FALSE}
+#grid.arrange(p3,p3_log,p1,p2,p4,p5,p6,nrow = 4, ncol = 2)
+print(p3)
+print(p3_log)
+print(p1)
+print(p2)
+print(p4)
+print(p5)
+print(p6)
+```
+
+### Results:
+- Tomorrows predicted case number is between **`r pred_val_Current`** and **`r pred_val_MeanGR`** cases.
+- Current doubling rate is **`r latestDRCurrent` days**
+- Mean doubling rate, i.e number of cases doubles every **`r DRCurrent` days**.
+- Median doubling rate, i.e number of cases doubles every **`r DRMedian` days**.
+- Latest Observed Growth Rate **`r multiplier[,"GrowthRate"]*100`** percent.
+- Mean Growth Rate: **`r meanGR*100`** percent.
+- Median Growth Rate: **`r median(dataTrend1$GrowthRate)*100`** percent.
+- Standard deviation: +/- **`r sdGR*100`**.
+
