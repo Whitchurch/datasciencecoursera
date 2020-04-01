@@ -15,6 +15,9 @@ output:
 library(ggplot2)
 library(dplyr)
 library(statsr)
+library(tidyr)
+library(knitr)
+library(forcats)
 ```
 
 ### Load data
@@ -33,33 +36,52 @@ load("gss.Rdata")
 * * *
 
 ## Part 1: Data
-### <span style="color: brown">What is this data about?  </span> 
-- The GSS survey has been conducted since the year 1972.
-- Since 1972, the General Social Survey (GSS) has been monitoring societal change and studying the growing complexity of American society. The GSS aims to gather data on contemporary American society in order to monitor and explain trends and constants in attitudes, behaviors, and attributes; to examine the structure and functioning of society in general as well as the role played by relevant subgroups;.
+### <span style="color: brown">What is this data about?  </span>
+
+- The GSS survey has been conducted since the year 1972.  
+
+- Since 1972, the General Social Survey (GSS) has been monitoring societal change and studying the growing complexity of American society. The GSS aims to gather data on contemporary American society in order to monitor and explain trends and constants in attitudes, behaviors, and attributes; to examine the structure and functioning of society in general as well as the role played by relevant subgroups;.  
+
 - GSS questions cover a diverse range of issues including national spending priorities, marijuana use, crime and punishment, race relations, quality of life, confidence in institutions, and sexual behavior.
+
 
 ### <span style="color: brown">Notable changes to the survey</span> 
 #### <span style="color: red">GSS frequency of survey: </span> 
-- The survey used to be conducted annual from 1972-1994. Due to changes in funding, The surves has then been donducted bi-annually from 1996, 1998,2002 and so on, till date.
-- The method of taking the survey has evolved considerable over time. And currently circa 2020:
+- The survey used to be conducted annual from 1972-1994. Due to changes in funding, The surves has then been donducted bi-annually from 1996, 1998,2002 and so on, till date.  
+
+- The method of taking the survey has evolved considerable over time. And currently circa 2020:  
+
 #### <span style="color: red">GSS Administration: </span> 
-- The vast majority of GSS data is obtained in face-to-face interviews. 
-- Computer-assisted personal interviewing (CAPI) began in the 2002 GSS. 
-- Under some conditions when it has proved difficult to arrange an in-person interview with a sampled respondent, GSS interviews may be conducted by telephone.
+- The vast majority of GSS data is obtained in face-to-face interviews.  
+
+- Computer-assisted personal interviewing (CAPI) began in the 2002 GSS.  
+
+- Under some conditions when it has proved difficult to arrange an in-person interview with a sampled respondent, GSS interviews may be conducted by telephone.  
+
 
 ### <span style="color: brown">Structure of the survey?</span> 
-- The items appearing on the suervey are of 3 types: 
-- Permanent questions that occur in each and every survey
-- Rotating questions that appear in 2 out of 3 surveys.
+- The items appearing on the suervey are of 2 types:  
+
+- Permanent questions that occur in each and every survey  
+
+- Rotating questions that appear in 2 out of 3 surveys.  
+
 
 #### <span style="color: red">Sampling used in the GSS: </span> 
-- Around 1500 people were sampled annual from 1972 - 1992. Since 1994 two-samples of eize 1500 each are surveyed. However, the survey is conducted once every 2 years. There has been no oversampling done since 1994.
-- Modified probablilty sampling used from 1972-1974 (random sampling).
-- At the top most level, PSU (Primary Sampling Units) are: Metropolitan and non-Metropolitan areas. These are stratified, based on region, age and race before selection.
-- Within the PSU, they are broken down into :Block Groups and Enumeration Districts. the BG and ED were stratified according to race and income before selection.
-- The third stage of selection is the blocks, they had probablites assigned based on block size before the selection.
-- Inside the selected blocks, the average cluster size is 5 respondents per cluster.
-- So we have a sampling approach that uses: Stratified sampling at the PSU level -> Stratifies sampling at the BG and ED level -> selection of blocks by probablitly based on size -> finally we select clusters with (5 respondents) in a cluster.
+- Around 1500 people were sampled annual from 1972 - 1992. Since 1994 two-samples of eize 1500 each are surveyed. However, the survey is conducted once every 2 years. There has been no oversampling done since 1994.  
+
+- Modified probablilty sampling used from 1972-1974 (random sampling).  
+
+- At the top most level, PSU (Primary Sampling Units) are: Metropolitan and non-Metropolitan areas. These are stratified, based on region, age and race before selection.  
+
+- Within the PSU, they are broken down into :Block Groups and Enumeration Districts. the BG and ED were stratified according to race and income before selection.  
+
+- The third stage of selection is the blocks, they had probablites assigned based on block size before the selection.  
+
+- Inside the selected blocks, the average cluster size is 5 respondents per cluster.  
+
+- So we have a sampling approach that uses: Stratified sampling at the PSU level -> Stratifies sampling at the BG and ED level -> selection of blocks by probablitly based on size -> finally we select clusters with (5 respondents) in a cluster.  
+
 
 #### <span style="color: red">Generalizabilty concerns with the GSS survey: </span> 
 - The survey has been restricted only to the English speaking population of the US from: 1972- 2004.
@@ -77,24 +99,236 @@ In conclusion the survey is **Generalizable** across the English/Spanish US popu
 
 * * *
 
-## Part 2: Research question
-#### <span style="color: Brown">**Is there a relationship between gun-ownership, income and race ?** </span> 
-- I am really interested in exploring the relationship between gun-ownership and income
-- I am also interested in seeing if gun-ownership varies by race across the US.
-- This question is of personal relevance to me, as many law-enforcement officers in my part of the US lose their lives to gun-violence. Knowing if there is a relationship between gun-ownership to: poverty and race will give a better idea how best law-enforcement can safely approach hot-spot areas where it could be inferred that guns are more often to be found. 
+## Part 2: Research question 
+
+#### <span style="color: Brown">**Is there a relationship between gun-ownership and race ?** </span> 
+1) I am really interested in exploring the relationship between gun-ownership and race.  
+
+2)  <span style="color: Red">**Warning :**</span>  Anything from this study can only be considered to be **Associative** in nature.  
+
+3)  This research question is interesting, as it can serve as a launching pad to delve deeper and analyze other factors round the **"why"** of various factors that contribute to prevelance of guns in certain races over others.  
+
+It can open up our understanding into underlying factors or even discover whether there are **confounding** variables that might lead to any observed associative relationships between Race and Guns.  
+
+
 
 * * *
 
 ## Part 3: Exploratory data analysis
-```{r}
+### <span style="color: Orange">**Step1 : **</span>  
+
+#### <span style="color: darkgreen">**Selecting the variables of interest:** </span>
+We begin the analysis by selecting the following 2 variables from our dataset:  
+
+- <span style="color: Green">owngun:</span> Contains Respondent's answer to the question: *Do you happen to have in your home (or garage) any guns or revolvers?*  
+
+- <span style="color: Green">race:</span> Contains Respondent's answer to the question: *What race do you consider yourself?*
+
+```{r load-variables, message=FALSE}
+gunsandrace <- gss%>%select(c("race","owngun"))
+str(gunsandrace)
 
 ```
+### <span style="color: Orange">**Step2 : **</span>    
+
+#### <span style="color: darkgreen">**Create a Summary Statistic table:** </span>  
+
+We start to organize the data into a wide format, by grouping the data bases on:  
+
+- OwnGun as the row of the table.  
+
+- Race as the column  of the table.  
+
+```{r create-summaryTable, message=FALSE}
+contigencyTable <- gunsandrace%>%group_by(race)%>%count(owngun)
+# Our data is in a long format. In order to generate the contigency table of interest and for easy visualization.
+# We are going to transform the data into a wide format:  Race will form the columns, and ownguns will form the rows
+
+contigencyTable_WF <- contigencyTable%>%spread(race,n)%>%mutate(Column_Total =  rowSums(.[2:4]))%>%mutate(Row_Total = colSums(.[2:5]))
+contigencyTable_WF$owngun <- fct_explicit_na(contigencyTable_WF$owngun,na_level = "Not Answered")
+kable(contigencyTable_WF)
+
+```
+
+- <span style="color: Green">owngun:</span> CATEGORICAL variable contain 4 levels: (Yes, No, Refused, Not Answered)  
+
+- <span style="color: Green">Race:</span> CATEGORICAL variable has been spread out in a wide format as: WHITE, BLACK and OTHER  
+
+- <span style="color: Green">Column_Total:</span> Contains the Row sum across all 3 race categories for each row.  
+
+- <span style="color: Green">Row_Total:</span> Contains the sum of all items in each column.  
+
+- <span style="color: Red">Note: Not Answered is NOT ignored as this is a huge %, it serves as it's own level in owngun</span>
+
+### <span style="color: Orange">**Step3 : **</span>    
+
+#### <span style="color: darkgreen">**Create visual representation of Guns vs race:** </span>  
+
+```{r plot-relationship, echo=FALSE, message=FALSE}
+gunsandrace$owngun <- fct_explicit_na(gunsandrace$owngun, na_level = "Not Answered")
+percentData <- gunsandrace %>% group_by(race) %>% count(owngun) %>%
+  mutate(ratio=scales::percent(n/sum(n)))
+percentData
+
+ggplot(data = gunsandrace, aes(x = race, fill = owngun))+geom_bar(position = "fill")+geom_text(data=percentData, aes(y=n,label=ratio),position=position_fill(vjust=0.5))+
+  ggtitle("Distribution of Guns by race")
+```
+
+- We see across the different race categories that , there indeed is a difference in percentage, of those who answer: Yes, No, Refuse, Not Answered for the question on guns.  
+
+- We need to establish, if the variations across races we see are purely due to chance in the sample, or if there really is a race to gun associavity.
 
 
 * * *
 
 ## Part 4: Inference
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button (green button with orange arrow) above. Make sure that your code is visible
-in the project you submit. Delete this note when before you submit your work.
+### <span style="color: Orange">**Step1 : **</span>    
+
+#### <span style="color: darkgreen">**Decide on the inference methodology:** </span>  
+
+- Since we are dealing with 2 categorical variables: owngun - race.  
+
+- Atleast 1 or both categorical variables have more than 2 levels.
+
+- <span style="color: Green">We have decided to use the: Chi-Square test of Independence.</span>  
+
+### <span style="color: Orange">**Step2 : **</span>    
+
+#### <span style="color: darkgreen">**Check conditions to apply Chi-Square test of independence:** </span> 
+
+<span style="color: Green">Independence:</span>  
+
+- Since the respondents for our data have been randomly selected from the population. We can assume that they are independent of each other.  
+
+- The total number of respondents in our sample is **57061**. This is definitely less than 10% of the US population. Since our survey is done without replacement of respondents. We can safely assume that this condition for independence has also been met.  
+- Each case should contribute to only one cell inside the table: We are able to ensure this condition holds, because, each respondent falls into only one of the ownguns category and one race category.  
+
+
+<span style="color: Green">Sample size:</span>  
+
+- Each cell should have an expected values of atleast 5.  
+
+- In order to ensure this condition is met, we need to generate the expected values for these observations.  
+
+### <span style="color: Orange">**Step3 : **</span>    
+
+#### <span style="color: darkgreen">**Create Expected Cases:** </span>  
+
+We begin by reprinting our summary statistic table: 
+```{r}
+kable(contigencyTable_WF)
+```
+
+- To calculate the expected cases, we first need to calculate the total numbers in each of the 4 owngun categorical variable: YES/No/Refused/Not Available.  
+
+- Luckily, we already calculated this data and it is available in our **Column_Total**, Column in the table.  
+
+- We also need the Total of each column, as well as the Total sample size, both of these are available in out **Row_Total** column.
+
+- Finally, to calculate the Expected Cases, we use the  following formula:  
+
+**Expected Cases =** **Row Total** **X** **Column Total** **/** **Total Observations** 
+
+- <span style="color: darkgreen">For Example:</span>
+- In order to calculate the Expected_White cases across all ownguns levels: Yes, No, Refused, Not Answered.  
+
+<span style="color: Orange">**Formula:**  
+
+- <span style="color: darkgreen"> Row_Total(White) X Column_Total(Yes/No/Reserved/Not Answered)</span> 
+
+- **Row_Total(White):** 46350  
+
+- **Column_Total for Yes:** 14000, 
+- **Column_Total for No:** 20144, 
+- **Column_Total for Reserved:** 315, 
+- **Column_Total for Not Answered:** 22602
+
+We have to repeat the above steps for: Black and Other in the following manner:
+
+- <span style="color: darkgreen">Row_Total(Black) X Column_Total(Yes/No/Reserved/Not Answered)</span>  
+
+- <span style="color: darkgreen">Row_Total(Other) X Column_Total(Yes/No/Reserved/Not Answered)</span>  
+
+Applying this we are able to calculate the expected values, and add it to our table.  
+
+```{r}
+contigencyTable_WF <- contigencyTable_WF%>%mutate(Expected_White = (Row_Total[1]*Column_Total[1:4])/57061,Expected_Black =(Row_Total[2]*Column_Total[1:4])/57061,Expected_Other =(Row_Total[3]*Column_Total[1:4])/57061)
+contigencyTable_WF$Expected_White <- round(contigencyTable_WF$Expected_White,digits = 0)
+contigencyTable_WF$Expected_Black <- round(contigencyTable_WF$Expected_Black,digits = 0)
+contigencyTable_WF$Expected_Other <- round(contigencyTable_WF$Expected_Other,digits = 0)
+kable(contigencyTable_WF)
+```
+
+- <span style="color: Green">Expected_White:</span> Gives the Expected number of cases for Whites, if there is no difference across races.  
+
+- <span style="color: Green">Expected_Black:</span> Gives the Expected number of cases for Blacks, if there is no difference across races.  
+
+- <span style="color: Green">Expected_Other:</span> Gives the Expected number of cases for Other, if there is no difference across races. 
+
+<span style="color: Green">**We see that all the expected values in all the cells are atleast 5 or greater**</span>
+
+<span style="color: Red">**Therefore we can apply the Chi-Square Test of Independence.**</span>  
+
+### <span style="color: Orange">**Step4 : **</span>    
+
+#### <span style="color: darkgreen">**Apply Chi-Square test of Independence:** </span>  
+
+Hypothesis:  
+
+<span style="color: darkgreen">**H0: There is no difference between GunOwnership and Race.**</span>  
+
+<span style="color: darkgreen">**HA: There is a difference between GunOwnership and Race.**</span>
+
+Under the assumption that the null hyopthesis H0 is true. We use the following formula to calculate the Chi-Square value:
+
+ $$\sum \frac{(Observed Value - Expected Value)*(Observed Value - Expected Value)}{Expected Value}$$  
+                        
+We now apply this formula to by first calculating the individual : Observed-Expected/Expected values. first and add them to our table.
+
+```{r}
+contigencyTable_WF$ChiWhite <- ((contigencyTable_WF$White[1:4]-contigencyTable_WF$Expected_White[1:4])^2)/contigencyTable_WF$Expected_White
+contigencyTable_WF$ChiBlack <- ((contigencyTable_WF$Black[1:4]-contigencyTable_WF$Expected_Black[1:4])^2)/contigencyTable_WF$Expected_Black
+contigencyTable_WF$ChiOther <- ((contigencyTable_WF$Other[1:4]-contigencyTable_WF$Expected_Other[1:4])^2)/contigencyTable_WF$Expected_Other
+kable(contigencyTable_WF)
+```
+
+We finally sum up all the newly calculated Chi-values to get the final Chi-square value.
+```{r}
+chisquare <- as.double(contigencyTable_WF%>%summarise(ChiSquare = sum(sum(ChiWhite),sum(ChiBlack),sum(ChiOther))))
+```
+
+The calculated chi-square value is: **`r chisquare`**
+
+We now use the R function **pchisq**
+
+Our degrees of freedom are: (Number of Row Observation -1) X (Number of Column Column - 1)  
+
+```{r}
+df <- (4-1)*(3-1)
+```
+
+The degrees of freedom is: `r df`
+
+Plugging in all the values into the R function:
+```{r}
+pvalue <- pchisq(chisquare,df,lower.tail = FALSE)
+```
+
+We get a p-value : **`r pvalue`**
+
+This p-value is really really tiny compared to our significance level of 5%.
+
+### <span style="color: Orange">**Conclusion **</span>  
+
+- The p-value : `r pvalue` is smaller than 5% significance level.  
+
+- Therefore we **reject the null hypothesis H0**, in favour of the alternative HA.  
+
+- <span style="color: red">**We reject the hypothesis that there is no relationship between Race and OwningGuns.**</span>  
+
+- The alternative that OwningGuns and Race are dependent on each other , the alternative is accepted.
+
+- Note: Just because owningGuns and Race are dependent, we cannot establish causality between them. It does open more interesting lines of thinking that maybe there are confounder variables like:income differences between races, belief.cultural differences between races that might have caused this **Associative** relationship.  
+
+- This has opened up more interesting questions that need to be explored further.
