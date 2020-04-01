@@ -47,9 +47,9 @@ load("gss.Rdata")
 
 ### <span style="color: brown">Notable changes to the survey</span> 
 #### <span style="color: red">GSS frequency of survey: </span> 
-- The survey used to be conducted annual from 1972-1994. Due to changes in funding, The surves has then been donducted bi-annually from 1996, 1998,2002 and so on, till date.  
+- The survey used to be conducted annual from 1972-1994. Due to changes in funding, The surves has then been conducted bi-annually from 1996, 1998,2002 and so on, till date.  
 
-- The method of taking the survey has evolved considerable over time. And currently circa 2020:  
+- The method of taking the survey has evolved considerably over time. And currently circa 2020:  
 
 #### <span style="color: red">GSS Administration: </span> 
 - The vast majority of GSS data is obtained in face-to-face interviews.  
@@ -60,7 +60,7 @@ load("gss.Rdata")
 
 
 ### <span style="color: brown">Structure of the survey?</span> 
-- The items appearing on the suervey are of 2 types:  
+- The items appearing on the survey are of 2 types:  
 
 - Permanent questions that occur in each and every survey  
 
@@ -68,7 +68,7 @@ load("gss.Rdata")
 
 
 #### <span style="color: red">Sampling used in the GSS: </span> 
-- Around 1500 people were sampled annual from 1972 - 1992. Since 1994 two-samples of eize 1500 each are surveyed. However, the survey is conducted once every 2 years. There has been no oversampling done since 1994.  
+- Around 1500 people were sampled annually from 1972 - 1992. Since 1994 two-samples of size 1500 each are surveyed. However, the survey is conducted once every 2 years. There has been no oversampling done since 1994.  
 
 - Modified probablilty sampling used from 1972-1974 (random sampling).  
 
@@ -89,7 +89,9 @@ load("gss.Rdata")
 - So , if a person knew neither English nor Spanish, at the moment, it looks like the survey does not cover those demographics. This seems to present a blind spot, that makes the survey not inclusive of the whole US population.
 
 ### <span style="color: Orange">**Answer : **</span>
--  <span style="color: Green">**Generalizability** :</span> Since the data is  collected using a survey of randomly selected Enghlish speaking and Spanish speaking individuals from stratified sample at the PSU -> BG level and finally cluster samping at the lowest level. across the US. We can safely say the survey is generalizable **only** across the English/Spanish speaking US population.  
+-  <span style="color: Green">**Sampling** :</span> Random sampling is used. It is organized in the following way: Stratified sampling at the PSU level -> Stratifies sampling at the BG and ED level -> selection of blocks by probablitly based on size -> finally we select clusters with (5 respondents **randomly selected**) in a cluster.  
+
+-  <span style="color: Green">**Generalizability** :</span> Since the data is  collected using a survey of randomly selected English speaking and Spanish speaking individuals from stratified sample at the PSU -> BG level and finally cluster samping at the lowest level. across the US. We can safely say the survey is generalizable **only** across the English/Spanish speaking US population.  
 
 - <span style="color: Green">**Causality** : </span> The survey is **NOT** useful for causality. As we have not randomly selected and randomly assigned individuals into experimental groups to draw any causual relationships among the variable of the data in which we seek to establish causality.  
 
@@ -174,6 +176,11 @@ ggplot(data = gunsandrace, aes(x = race, fill = owngun))+geom_bar(position = "fi
   ggtitle("Distribution of Guns by race")
 ```
 
+
+- <span style="color: darkgreen">By looking at the graphs, we can interpret that there seems to be variation across the races in terms of owning a gun. For example: The percentage of whites vs blacks who declare owning a gun drops from **26.9% to 16.0%.**</span>  
+
+- Similarly the variation amongst the other categories of No, Refused and Not Answered also show a difference amongst the races.
+
 - We see across the different race categories that , there indeed is a difference in percentage, of those who answer: Yes, No, Refuse, Not Answered for the question on guns.  
 
 - We need to establish, if the variations across races we see are purely due to chance in the sample, or if there really is a race to gun associavity.
@@ -182,6 +189,12 @@ ggplot(data = gunsandrace, aes(x = race, fill = owngun))+geom_bar(position = "fi
 * * *
 
 ## Part 4: Inference
+
+### <span style="color: Orange">**Step0 : Hypothesis **</span>   
+
+<span style="color: darkgreen">**H0: There is no difference between GunOwnership amongst the  Races.**</span>  
+
+<span style="color: darkgreen">**HA: There is a difference between GunOwnership amgonst Race.**</span>
 
 ### <span style="color: Orange">**Step1 : **</span>    
 
@@ -305,10 +318,13 @@ We now use the R function **pchisq**
 Our degrees of freedom are: (Number of Row Observation -1) X (Number of Column Column - 1)  
 
 ```{r}
-df <- (4-1)*(3-1)
+dimensionsTable <- gunsandrace%>%select(c(race,owngun))
+C1 <- length(levels(dimensionsTable$owngun))
+C2 <- length(levels(dimensionsTable$race))
+df <- (C1-1)*(C2-1)
 ```
 
-The degrees of freedom is: `r df`
+**The degrees of freedom is: `r df`**
 
 Plugging in all the values into the R function:
 ```{r}
@@ -319,15 +335,25 @@ We get a p-value : **`r pvalue`**
 
 This p-value is really really tiny compared to our significance level of 5%.
 
+
+### <span style="color: Orange">**Bonus : Re-check with MASS library **</span> 
+```{r}
+library(MASS)
+input_table <- table(dimensionsTable$owngun,dimensionsTable$race)
+chisq.test(input_table)
+```
+
+<span style="color: red">**Note: Since we are usin Chi-Square test for independence, we are not going to calculate confidence intervals. As in this test we compare more than 2 categories. And not just 2 level proportions**</span> 
+
 ### <span style="color: Orange">**Conclusion **</span>  
 
 - The p-value : `r pvalue` is smaller than 5% significance level.  
 
 - Therefore we **reject the null hypothesis H0**, in favour of the alternative HA.  
 
-- <span style="color: red">**We reject the hypothesis that there is no relationship between Race and OwningGuns.**</span>  
+- <span style="color: red">**We reject H0: There is no difference between GunOwnership and Race.**</span>  
 
-- The alternative that OwningGuns and Race are dependent on each other , the alternative is accepted.
+- The alternative that OwningGuns and Race are dependent on each other , **the alternative HA is accepted.**
 
 - Note: Just because owningGuns and Race are dependent, we cannot establish causality between them. It does open more interesting lines of thinking that maybe there are confounder variables like:income differences between races, belief.cultural differences between races that might have caused this **Associative** relationship.  
 
