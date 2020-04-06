@@ -56,6 +56,25 @@ DoublingRate <- function(absoluteNumbers)
   return ((doublingrRate))  
 }
 
+#Calculate the mean and median growth rate:
+MeanMediangrowthrate <- function(dataTrend1)
+{
+  MeanGRTrend <- NULL
+  MedianGRTrend <- NULL
+  
+  for(i in 1:length(dataTrend1$GrowthRate))
+  {
+    MedianGRTrend[i] <- median(dataTrend1[1:i,"GrowthRate"])
+    MeanGRTrend[i] <- mean(dataTrend1[1:i,"GrowthRate"])
+  }
+  
+  dataTrend1$MedianGRT = MedianGRTrend
+  dataTrend1$MeanGRT = MeanGRTrend
+  
+  return(dataTrend1)
+
+}
+
 ```
 
 
@@ -121,9 +140,11 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
-#Median growth rate trend 
-p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "Arizona Median Growth Rate")
+dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
 
+#Median growth rate trend 
+#Median growth rate trend 
+p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "Arizona Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
 sdGR = sd(dataTrend1$GrowthRate)
@@ -231,6 +252,25 @@ DoublingRate <- function(absoluteNumbers)
   return ((doublingrRate))  
 }
 
+#Calculate the mean and median growth rate:
+MeanMediangrowthrate <- function(dataTrend1)
+{
+  MeanGRTrend <- NULL
+  MedianGRTrend <- NULL
+  
+  for(i in 1:length(dataTrend1$GrowthRate))
+  {
+    MedianGRTrend[i] <- median(dataTrend1[1:i,"GrowthRate"])
+    MeanGRTrend[i] <- mean(dataTrend1[1:i,"GrowthRate"])
+  }
+  
+  dataTrend1$MedianGRT = MedianGRTrend
+  dataTrend1$MeanGRT = MeanGRTrend
+  
+  return(dataTrend1)
+
+}
+
 ```
 
 
@@ -296,10 +336,12 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
+dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
+
+
 #Median growth rate trend 
-p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "US Median Growth Rate")
-
-
+#Median growth rate trend 
+p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "US Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
 
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
@@ -406,6 +448,25 @@ DoublingRate <- function(absoluteNumbers)
   return ((doublingrRate))  
 }
 
+#Calculate the mean and median growth rate:
+MeanMediangrowthrate <- function(dataTrend1)
+{
+  MeanGRTrend <- NULL
+  MedianGRTrend <- NULL
+  
+  for(i in 1:length(dataTrend1$GrowthRate))
+  {
+    MedianGRTrend[i] <- median(dataTrend1[1:i,"GrowthRate"])
+    MeanGRTrend[i] <- mean(dataTrend1[1:i,"GrowthRate"])
+  }
+  
+  dataTrend1$MedianGRT = MedianGRTrend
+  dataTrend1$MeanGRT = MeanGRTrend
+  
+  return(dataTrend1)
+
+}
+
 ```
 
 
@@ -470,8 +531,11 @@ p5<- ggplot() +geom_line(data=dataTrend1, aes(x=Days, y=doublinrRate),color = "R
 #Scatter plor of Growthrate versus Doubling Rate
 p6 <- ggplot()+geom_point(data = dataTrend1, aes(x = doublinrRate, y = GrowthRate))+labs(title = "Doubling Rate vs Growth Rate")
 
+dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
+
+
 #Median growth rate trend 
-p7 <- ggplot()+geom_point(data = dataTrend1, aes(x = Days, y = median(GrowthRate)))+labs(title = "India Median Growth Rate")
+p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "India Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
 
 
 
