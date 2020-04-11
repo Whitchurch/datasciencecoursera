@@ -1,7 +1,7 @@
 ---
-title: "Arizona/US/India Corona Trends- 10th April 2020 with tomorrow's prediction"
+title: "Arizona/US/India Corona Trends- 11th April 2020 with tomorrow's prediction"
 author: "Whitchurch Muthumani"
-date: "4/10/2020"
+date: "4/11/2020"
 output: pdf_document
 ---
 
@@ -75,14 +75,49 @@ MeanMediangrowthrate <- function(dataTrend1)
 
 }
 
+#Calculate ratio of newdeaths/newcases
+newDeathstonewCases <- function(absolutenumbers,totaldeaths)
+{
+  newCases <- NULL
+  newDeaths <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+    if(i == length(absolutenumbers))
+    {
+      print("reached the end")
+    }else{
+     newDeaths[i] = (totaldeaths[i]-totaldeaths[i+1])
+     newCases[i] = (absolutenumbers[i]-absolutenumbers[i+1]) 
+    }
+  }
+  
+
+  days <- seq(2:length(absolutenumbers))
+ return(data.frame( newDeaths = rev(newDeaths),newCases = rev(newCases),Days = days))
+ 
+}
+
+#Calculate ratio of deaths to totalCases
+totalDeathstoCases <- function(absolutenumbers,totaldeaths)
+{
+  ratio <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+
+     ratio[i] = (totaldeaths[i])/(absolutenumbers[i]) 
+  }
+  
+  return(rev(ratio))
+}
 ```
 
 
 ```{r include=FALSE}
 #Arizona
 
-absolutenumbers <- c(3112,3018,2726,2575,2456,2269,2019,1769,1598,1413,1289,1157,919,773,665,508,401,326,234,152,104,71,44,28,20,18,12)
+absolutenumbers <- c(3393,3112,3018,2726,2575,2456,2269,2019,1769,1598,1413,1289,1157,919,773,665,508,401,326,234,152,104,71,44,28,20,18,12)
 
+totaldeaths <- c(108,97,89,80,73,65,64,52,41,32,29,24,20,17,15,13,9,6,6,3,2,2,1,0,0,0,0,0)
 
 #America
 #absolutenumbers <- c(101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
@@ -145,6 +180,34 @@ dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
 #Median growth rate trend 
 #Median growth rate trend 
 p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "Arizona Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
+
+
+deathrate1 <- na.exclude(DailyGrowthRate(totaldeaths))
+doublingdeathrate1 <- na.exclude(DoublingRate(deathrate1))
+days1 <- seq(1:length(deathrate1))
+dataDeathTrend1 <- data.frame(DeathRate = deathrate1,Days = days1,doublinrRate = doublingdeathrate1)
+#print(dataDeathTrend1)
+#multiplier <- tail(totaldeaths, n = 1)
+#pred_val <- (head(dataDeathTrend1, n = 1)*multiplier[,"DeathRate"])+head(dataDeathTrend1, n = 1)
+
+p8 <- ggplot(data=dataDeathTrend1, aes(x=Days, y=DeathRate, group=1)) +ggtitle("Arizona: Death Rate")+
+  geom_line(color = "Green")+
+  geom_point()
+
+
+rationewdeathtocases <- newDeathstonewCases(absolutenumbers,totaldeaths)
+
+p9 <- ggplot(data=rationewdeathtocases, aes(x=Days, y=newCases, group=1)) +ggtitle("Arizona:newCases(Orange)")+
+  geom_line(color = "Orange")+geom_point()
+
+totaldeathstocases <- totalDeathstoCases(absolutenumbers,totaldeaths)
+days <- seq(1:length(absolutenumbers))
+datatotaldeathstocasesTrend <- data.frame(ratio = totaldeathstocases,Days = days)
+#Scatter plot of totalcases to totaldeaths
+p10 <- ggplot(data=datatotaldeathstocasesTrend, aes(x=Days, y=ratio, group=1)) +ggtitle("Arizona: TotalDeaths/TotalCases")+
+  geom_line(color = "Yellow")+
+  geom_point()
+
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
 sdGR = sd(dataTrend1$GrowthRate)
@@ -190,6 +253,8 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p9)
+print(p10)
 print(p7)
 ```
 
@@ -271,6 +336,58 @@ MeanMediangrowthrate <- function(dataTrend1)
 
 }
 
+# #Calculate ratio of newdeaths/newcases
+# newDeathstonewCases <- function(absolutenumbers,totaldeaths)
+# {
+#   ratio <- NULL
+#   for(i in 1:length(absolutenumbers))
+#   {
+#     if(i == length(absolutenumbers))
+#     {
+#       print("reached the end")
+#     }else{
+#      ratio[i] = (totaldeaths[i]-totaldeaths[i+1])/(absolutenumbers[i]-absolutenumbers[i+1]) 
+#     }
+#   }
+#   
+#   return(rev(ratio))
+# }
+
+#Calculate ratio of newdeaths/newcases
+newDeathstonewCases <- function(absolutenumbers,totaldeaths)
+{
+  newCases <- NULL
+  newDeaths <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+    if(i == length(absolutenumbers))
+    {
+      print("reached the end")
+    }else{
+     newDeaths[i] = (totaldeaths[i]-totaldeaths[i+1])
+     newCases[i] = (absolutenumbers[i]-absolutenumbers[i+1]) 
+    }
+  }
+  
+
+  days <- seq(2:length(absolutenumbers))
+ return(data.frame( newDeaths = rev(newDeaths),newCases = rev(newCases),Days = days))
+ 
+}
+
+#Calculate ratio of deaths to totalCases
+totalDeathstoCases <- function(absolutenumbers,totaldeaths)
+{
+  ratio <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+
+     ratio[i] = (totaldeaths[i])/(absolutenumbers[i]) 
+  }
+  
+  return(rev(ratio))
+}
+
 ```
 
 
@@ -280,7 +397,12 @@ MeanMediangrowthrate <- function(dataTrend1)
 
 #America
 
-absolutenumbers <- c(489.646*1000,454.615*1000,418.451*1000,386.571*1000,355.834*1000,327.871*1000,300.432*1000,265.506*1000,235.281*1000,205.035*1000,176.518*1000,145.369*1000,133.094*1000,123.578*1000,101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
+absolutenumbers <- c(521.623*1000,489.646*1000,454.615*1000,418.451*1000,386.571*1000,355.834*1000,327.871*1000,300.432*1000,265.506*1000,235.281*1000,205.035*1000,176.518*1000,145.369*1000,133.094*1000,123.578*1000,101.7*1000,83.8*1000,65.8*1000,53.7*1000,43.8*1000,33.3*1000,25*1000,19*1000,13.7*1000,7.8*1000,6.4*1000,4.6*1000,3.5*1000,2.7*1000)
+
+totaldeaths <- c(20057,18325,16691,14791,12851,10880,9622,8457,7127,6081,5107,4057,3143,2585,2222,1697,1296,1028,781,556,414,301,255,206,150,110,87,69,57,48,41,38,30,26,22,19,15,12,11,9,6,1,1)
+
+
+
 
 ```
 
@@ -343,6 +465,29 @@ dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
 #Median growth rate trend 
 p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "US Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
 
+deathrate1 <- na.exclude(DailyGrowthRate(totaldeaths))
+doublingdeathrate1 <- na.exclude(DoublingRate(deathrate1))
+days1 <- seq(1:length(deathrate1))
+dataDeathTrend1 <- data.frame(DeathRate = deathrate1,Days = days1,doublinrRate = doublingdeathrate1)
+#print(dataDeathTrend1)
+#multiplier <- tail(totaldeaths, n = 1)
+#pred_val <- (head(dataDeathTrend1, n = 1)*multiplier[,"DeathRate"])+head(dataDeathTrend1, n = 1)
+
+p8 <- ggplot(data=dataDeathTrend1, aes(x=Days, y=DeathRate, group=1)) +ggtitle("US: Death Rate")+
+  geom_line(color = "Green")+
+  geom_point()
+
+rationewdeathtocases <- newDeathstonewCases(absolutenumbers,totaldeaths)
+
+p9 <- ggplot(data=rationewdeathtocases, aes(x=Days, y=newCases, group=1)) +ggtitle("US:newCases(Orange)")+
+  geom_line(color = "Orange")+geom_point()
+totaldeathstocases <- totalDeathstoCases(absolutenumbers,totaldeaths)
+days <- seq(1:length(absolutenumbers))
+datatotaldeathstocasesTrend <- data.frame(ratio = totaldeathstocases,Days = days)
+#Scatter plot of totalcases to totaldeaths
+p10 <- ggplot(data=datatotaldeathstocasesTrend, aes(x=Days, y=ratio, group=1)) +ggtitle("US: TotalDeaths/TotalCases")+
+  geom_line(color = "Yellow")+
+  geom_point()
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
 sdGR = sd(dataTrend1$GrowthRate)
@@ -388,6 +533,8 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p9)
+print(p10)
 print(p7)
 ```
 
@@ -467,6 +614,57 @@ MeanMediangrowthrate <- function(dataTrend1)
 
 }
 
+#Calculate ratio of newdeaths/newcases
+# newDeathstonewCases <- function(absolutenumbers,totaldeaths)
+# {
+#   ratio <- NULL
+#   for(i in 1:length(absolutenumbers))
+#   {
+#     if(i == length(absolutenumbers))
+#     {
+#       print("reached the end")
+#     }else{
+#      ratio[i] = (totaldeaths[i]-totaldeaths[i+1])/(absolutenumbers[i]-absolutenumbers[i+1]) 
+#     }
+#   }
+#   
+#   return(rev(ratio))
+# }
+
+#Calculate ratio of newdeaths/newcases
+newDeathstonewCases <- function(absolutenumbers,totaldeaths)
+{
+  newCases <- NULL
+  newDeaths <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+    if(i == length(absolutenumbers))
+    {
+      print("reached the end")
+    }else{
+     newDeaths[i] = (totaldeaths[i]-totaldeaths[i+1])
+     newCases[i] = (absolutenumbers[i]-absolutenumbers[i+1]) 
+    }
+  }
+  
+
+  days <- seq(2:length(absolutenumbers))
+ return(data.frame( newDeaths = rev(newDeaths),newCases = rev(newCases),Days = days))
+ 
+}
+
+#Calculate ratio of deaths to totalCases
+totalDeathstoCases <- function(absolutenumbers,totaldeaths)
+{
+  ratio <- NULL
+  for(i in 1:length(absolutenumbers))
+  {
+
+     ratio[i] = (totaldeaths[i])/(absolutenumbers[i]) 
+  }
+  
+  return(rev(ratio))
+}
 ```
 
 
@@ -475,8 +673,9 @@ MeanMediangrowthrate <- function(dataTrend1)
 #absolutenumbers <- c(773,665,508,401,326,234,152,104,71,44,28,20,18,12)
 
 #America
-absolutenumbers <- c(7598,6653,5749,5311,4778,3588,3082,2567,2341,1637,1397,1251,1071,1024,987,887,727,657,536,499,396,332,249,194,169,143,129,114,100,82,74,62,62,47,40,34,31,30,29,7,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
+absolutenumbers <- c(8339,7598,6653,5749,5311,4778,3588,3082,2567,2341,1637,1397,1251,1071,1024,987,887,727,657,536,499,396,332,249,194,169,143,129,114,100,82,74,62,62,47,40,34,31,30,29,7,6,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
 
+totaldeaths <- c(288,246,227,178,160,136,118,99,86,72,58,35,27,24,20,20,12,10,10,7,5,5,4,3,3,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 ```
 
 ```{r include=FALSE,message=FALSE}
@@ -537,7 +736,30 @@ dataTrend1 <- MeanMediangrowthrate(dataTrend1 = dataTrend1)
 #Median growth rate trend 
 p7 <- ggplot()+geom_line(data = dataTrend1, aes(x = Days, y = MedianGRT),color = "Blue")+labs(title = "India Median(BLUE)VsMean(RED) Growth Rate")+geom_line(data=dataTrend1, aes(x=Days , y=MeanGRT),color = "Red")
 
+deathrate1 <- na.exclude(DailyGrowthRate(totaldeaths))
+doublingdeathrate1 <- na.exclude(DoublingRate(deathrate1))
+days1 <- seq(1:length(deathrate1))
+dataDeathTrend1 <- data.frame(DeathRate = deathrate1,Days = days1,doublinrRate = doublingdeathrate1)
+#print(dataDeathTrend1)
+#multiplier <- tail(totaldeaths, n = 1)
+#pred_val <- (head(dataDeathTrend1, n = 1)*multiplier[,"DeathRate"])+head(dataDeathTrend1, n = 1)
 
+p8 <- ggplot(data=dataDeathTrend1, aes(x=Days, y=DeathRate, group=1)) +ggtitle("India: Death Rate")+
+  geom_line(color = "Green")+
+  geom_point()
+
+rationewdeathtocases <- newDeathstonewCases(absolutenumbers,totaldeaths)
+
+p9 <- ggplot(data=rationewdeathtocases, aes(x=Days, y=newCases, group=1)) +ggtitle("India:newCases(Orange)")+
+  geom_line(color = "Orange")+geom_point()
+
+totaldeathstocases <- totalDeathstoCases(absolutenumbers,totaldeaths)
+days <- seq(1:length(absolutenumbers))
+datatotaldeathstocasesTrend <- data.frame(ratio = totaldeathstocases,Days = days)
+#Scatter plot of totalcases to totaldeaths
+p10 <- ggplot(data=datatotaldeathstocasesTrend, aes(x=Days, y=ratio, group=1)) +ggtitle("India: TotalDeaths/TotalCases")+
+  geom_line(color = "Yellow")+
+  geom_point()
 
 #Confidence Interval for mean population GrowthRate:
 meanGR = mean(dataTrend1$GrowthRate)
@@ -584,7 +806,10 @@ print(p2)
 print(p4)
 print(p5)
 print(p6)
+print(p9)
+print(p10)
 print(p7)
+
 ```
 
 ### Results:
@@ -596,4 +821,3 @@ print(p7)
 - Mean Growth Rate: **`r meanGR*100`** percent.
 - Median Growth Rate: **`r median(dataTrend1$GrowthRate)*100`** percent.
 - Standard deviation: +/- **`r sdGR*100`**.
-
