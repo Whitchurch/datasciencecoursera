@@ -679,7 +679,7 @@ the adjusted R-squared: `r summary(model)$adj.r.squared`
 
 **The adjusted R-squared has increased, so critics score is a useful predictor variable, along with audience_score**
 
-#### <span style="color: red">**Let us begin adding in the categorical variables now** </span> 
+#### <span style="color: darkgreen">**Section 2: Build model with categorical variables** </span> 
 
 #### <span style="color: red">**audience_rating** </span>
 ```{r, fig.width = 48, fig.height = 48}
