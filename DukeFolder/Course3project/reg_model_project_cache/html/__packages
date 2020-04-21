@@ -1,0 +1,10 @@
+base
+ggplot2
+dplyr
+coda
+Matrix
+BayesFactor
+statsr
+GGally
+knitr
+gridExtra

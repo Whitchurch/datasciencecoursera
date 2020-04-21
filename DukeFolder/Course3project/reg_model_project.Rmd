@@ -15,6 +15,9 @@ output:
 library(ggplot2)
 library(dplyr)
 library(statsr)
+library(GGally)
+library(knitr)
+library(gridExtra)
 ```
 
 ### Load data
@@ -24,7 +27,7 @@ your data file will be called `movies`. Delete this note when before you submit
 your work. 
 
 ```{r load-data}
-#load("movies.Rdata")
+load("movies.Rdata")
 ```
 
 
@@ -32,39 +35,844 @@ your work.
 * * *
 
 ## Part 1: Data
+### <span style="color: brown">What is this data about?  </span>  
+
+- The dataset contains a list of randomly sampled movies from the IMDB and Rotten Tomatoe movie databases.  
+
+- It contains information about both audience and critic scores about how much they like/dislike movies. As well as other variables associated with the movie.  
+
+- The dataset contains 651 rows and 32 variables.  
+
+- The codebook can be viewed from this link: [Code Book](https://d18ky98rnyall9.cloudfront.net/_73393031e98b997cf2445132f89606a1_movies_codebook.html?Expires=1586908800&Signature=IZy8756SrMG5MDxovj4cf9XfLTeDQzOuNK250lyE~TgJ1sfjmrUJ17K2jc3MdX~NsFgNJogFeS4K-7iKNRlFmQzdT~zaW1NplyDa9vc8uUCvBtq1RXHKparTVJxQPfAItI0ol4WCvW-wNE1qiuT37XJ6~5ZYqd75nJEvoZMtsnI_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A)
+
+#### <span style="color: red">Sampling: </span> 
+
+- **Random Sampling** was used in the selection of the movies from the IMDB and Rotten Tomatoe databases.
+
+#### <span style="color: red">Generalizability and Association vs Causation</span>
+
+<span style="color: Green">**Generalizability** :</span>
+
+- The survey uses data from the Rotten Tomatoes and IMDB databases.
+
+- These are some of the biggest databases in the world, that has data on a huge repository of movies from around the world.
+
+- However, on closer inspection. The data about the movies in the sample contain only English language movies.  
+
+### <span style="color: Orange">**Answer : **</span>
+- So we can safely say that the sample data is generalizable **only** to English language movies from the IMDB and Rotten Tomato database.  
+
+<span style="color: Green">**Causality** :</span>
+
+- The data is **Associative** at the moment.
+
+- However, controlled random assignment of new movies to any model generated, can be used to establish **causal** relationships between **response** and **explanatory** variables.
+
+### <span style="color: Orange">**Answer : **</span>
+
+- The data is **Associative** at the moment.  
+
+- **However** ,there is a possibilty of drawing conclusions on **causality** only after conducting many simulations on generated models to figure out there is strong evidence of **causality** between the **response** and **explanatory** variables used to create the model.
+
 
 
 * * *
 
 ## Part 2: Research question
+#### <span style="color: Brown">**What are the best predictor variables to create an accurate model to predict an IMDB score ?** </span> 
 
+- Real life modelling involves,looking at lots of variables from different sources and piecing them together to make a robust model that can predict an acurate outcome at a specified confidence interval. 
+
+- I am interested in creating a predictor with a 95% confidence interval to predict the IMDB score of a movie, based on various predictor variables.  
+
+- I am planning to create the most efficient parsimonious model, which can explain most of the variability in the IMDB ratings.  
+
+- <span style="color: Green">**In order to achieve this , I will be using a forward selection approach, with emphasis on getting the best adjusted R-squared value.**</span>
 
 
 * * *
 
 ## Part 3: Exploratory data analysis
+### <span style="color: Orange">**Step1 : **</span>  
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+#### <span style="color: darkgreen">**We begin by having an overview of the model:** </span> 
+
+```{r}
+str(movies)
+```
+### <span style="color: Brown">**Result: **</span> 
+
+- We see there are **10 numeric variables** in the dataset:  
+
+- title,actor1-actor5 , imdb_url, rt_url are **9 character variables**.  
+
+- there are **12 factor variables** in the dataset.
+
+- there is **1 integer variable** imdb_num_votes. 
+
+
+### <span style="color: Orange">**Step2 : **</span>  
+
+#### <span style="color: darkgreen">**Let us now plot a ggpairs plot of all the numeric variables in our dataset.** </span> 
+
+
+```{r, fig.width = 12, fig.height= 12, message=FALSE, warning=FALSE, cache=TRUE}
+m1 <- movies%>%select(c(runtime,thtr_rel_year,thtr_rel_month,thtr_rel_day,dvd_rel_year,dvd_rel_month,dvd_rel_day,imdb_rating,imdb_num_votes,critics_score,audience_score))
+
+ggpairs(data = m1)
+```
+
+#### <span style="color: red">**ANOVA** </span>
+```{r}
+AnoV <- aov(imdb_rating~imdb_num_votes+critics_score+audience_score+runtime+thtr_rel_year+thtr_rel_month+thtr_rel_day+dvd_rel_year+dvd_rel_month+dvd_rel_day, data = m1)
+summary(AnoV)
+```
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~imdb_num_votes+critics_score+audience_score+runtime+thtr_rel_year+thtr_rel_month+thtr_rel_day+dvd_rel_year+dvd_rel_month+dvd_rel_day, data = m1)
+#summary(lm2_1)$r.squared
+#summary(lm2_1)$adj.r.squared
+```
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+- We observe from ANOVA: critics_score, audience_score, imdb_num_votes, runtime. Contribute maximum to the variability, due to ther high values.
+
+- We will rebuild a model with only these 4, to see what the R values look like.
+
+```{r}
+AnoV <- aov(imdb_rating~imdb_num_votes+critics_score+audience_score+runtime, data = m1)
+summary(AnoV)
+```
+
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~imdb_num_votes+critics_score+audience_score+runtime, data = m1)
+summary(lm2_1)
+```
+
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+
+
+### <span style="color: Brown">**Result:  Why did we pick only these 4 numeric variables **</span> 
+
+- We see that this parsimonious model has a better overall adjusted R-squared
+
+- Therefore, these 4 numeric variables will be analyzed in depth, to build out model.
+
+- Also these 4 numeric variables have the highest correlation coefficients, which indicated they have a more linear relationship. The other numeric variables can be dropped from consideration since they do not have strong linear relationsips.
+
+- I am **NOT** taking the critics_score and audience_score collinearity. Because there has been times when critics and audiences have diverging scores. So even though the correlation seems high, based on experience. I am not going to use collineartiy to drop one of them. Besides there must be some really important information that seems to superceded the collinearity condition, as the adjusted_R squared value has actually gone up substantially.
+
+
+
+
+### <span style="color: Orange">**Step3 : **</span>  
+
+#### <span style="color: darkgreen">plot **IMDB rating** against the **11 factor variables(excluding studio)** to see if we can learn something: </span> 
+
+
+```{r, fig.width = 12, fig.height= 12, message=FALSE, warning=FALSE,cache=TRUE}
+m2 <- movies%>%select(c(imdb_rating,title_type,genre,mpaa_rating,critics_rating,audience_rating,best_pic_nom,best_pic_win,best_actor_win,best_actress_win,best_dir_win,top200_box))
+
+ggpairs(data = m2)
+
+```
+
+### <span style="color: Brown">**Result: **</span> 
+
+- Looking at the first row, we can see that most categorical variables exhibit a high degree of variance against the imdb_rating. This is something interesting that needs to be noted.  the 3 that seem to have the least variance are: best_actor_win, best_actress_win, best_director_win.  
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs title_type** </span>
+```{r}
+AnoV <- aov(imdb_rating~title_type, data = m2)
+summary(AnoV)
+```
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~title_type, data = m2)
+summary(lm2_1)
+```
+
+### <span style="color: Brown">**Result:**</span> 
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+<span style="color: brown">**Note** adjusted R-squared has not dropped significantly, this seems like a good candidate for our model</span>  
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs genre** </span>
+```{r}
+AnoV <- aov(imdb_rating~genre, data = m2)
+summary(AnoV)
+```
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~genre, data = m2)
+summary(lm2_1)
+```
+
+### <span style="color: Brown">**Result:**</span> 
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+<span style="color: brown">**Note** adjusted R-squared has not dropped significantly, this seems like a good candidate for our model</span>  
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs mpaa_rating** </span>
+```{r}
+AnoV <- aov(imdb_rating~mpaa_rating, data = m2)
+summary(AnoV)
+```
+
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~mpaa_rating, data = m2)
+summary(lm2_1)
+```
+
+
+### <span style="color: Brown">**Result:**</span> 
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+<span style="color: brown">**Note** mpaa_rating seems to have a verly low R-squared and an even lower adjusted R-squared. We may ignore this while buiilding the model.</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs critics_rating** </span>
+```{r}
+AnoV <- aov(imdb_rating~critics_rating, data = m2)
+summary(AnoV)
+```
+
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~critics_rating, data = m2)
+summary(lm2_1)
+```
+
+### <span style="color: Brown">**Result:**</span> 
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+<span style="color: brown">**Note** adjusted R-squared has not dropped significantly, this seems like a good candidate for our model</span>  
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs audience_rating** </span>
+
+```{r}
+AnoV <- aov(imdb_rating~audience_rating, data = m2)
+summary(AnoV)
+```
+
+```{r, include=FALSE}
+lm2_1 <- lm(imdb_rating~audience_rating, data = m2)
+summary(lm2_1)
+```
+
+
+### <span style="color: Brown">**Result:**</span> 
+
+<span style="color: red">**Multiple R-squared:** </span> **`r summary(lm2_1)$r.squared`** 
+
+<span style="color: red">**Adjusted R-squared:** </span> **`r summary(lm2_1)$adj.r.squared`**
+
+<span style="color: brown">**Note** adjusted R-squared has not dropped significantly, this seems like a good candidate for our model</span>  
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs best_pic_nom** </span>
+```{r}
+AnoV <- aov(imdb_rating~best_pic_nom, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~best_pic_nom, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** adjusted R-squared has not dropped significantly, this seems like a good candidate for our model</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs best_pic_win** </span>
+```{r}
+AnoV <- aov(imdb_rating~best_pic_win, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~best_pic_win, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** This seems like a decent candidate, but might be dropped as adjusted R-squared is quite small</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs best_actor_win** </span>
+```{r}
+AnoV <- aov(imdb_rating~best_actor_win, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~best_actor_win, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** adjusted R-squared is too small to be of significance, this looks to be definitely dropped. This corresponds to the lack of noticable variance in the box-plots.</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs best_actress_win** </span>
+```{r}
+AnoV <- aov(imdb_rating~best_actress_win, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~best_actress_win, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** adjusted R-squared is too small to be of any value, we will ignore this while building the model</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs best_dir_win** </span>
+```{r}
+AnoV <- aov(imdb_rating~best_dir_win, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~best_dir_win, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** adjusted R-squared is really small, we will be dropping this while building the model</span> 
+
+* * *
+
+#### <span style="color: red">ANOVA and adjusted-R-Squared: </span> <span style="color: darkgreen"> **imdb_rating vs top200_box** </span>
+```{r}
+AnoV <- aov(imdb_rating~top200_box, data = m2)
+summary(AnoV)
+
+lm2_1 <- lm(imdb_rating~top200_box, data = m2)
+summary(lm2_1)
+```
+
+<span style="color: red">**Note** adjusted R-squared os really small. We won't be including this in our model</span> 
+
+<span style="color: red"></span>
+ 
+* * *
+
+### <span style="color: Orange">**Step4 : **</span>  
+
+#### <span style="color: darkgreen">**Now we can look at the relationship between IMDB_ratings and studios next:** </span> 
+
+```{r, fig.width = 24, fig.height= 24, message=FALSE, warning=FALSE,cache=TRUE}
+m3 <- movies%>%select(c(imdb_rating,studio))
+
+```
+```{r, fig.width = 24, fig.height= 24, message=FALSE, warning=FALSE, cache=TRUE}
+#m4 <- movies%>%select(c(imdb_rating,title))
+ggplot(data = m3,aes(x = studio, y = imdb_rating))+geom_boxplot()+coord_flip()
+##ggplot(data = m4[1:10,], aes(x = title, y = imdb_rating))+geom_boxplot()
+
+```
+Let us do an ANOVA to check if there is any relationship, as well as check the adjusted R-squared via a linear model.
+```{r}
+AnoV <- aov(imdb_rating~studio, data = m3)
+summary(AnoV)
+
+lm4 <- lm(imdb_rating~studio, data = m3)
+summary(lm4)$r.squared
+summary(lm4)$adj.r.squared
+```
+
+
+- boxplot of imdb_rating versus studio shows an interesting variation among the different studios.  Certain studios show a skewed distribution with hign medians, with long left or right skewes, certain other studions have a median high imdb_rating, compared to the rest. This box plot has lots of interesting information. And can be it's own topic of research.
+
+- <span style="color: red"> **NOTE** The difference between R-squared of: 0.4059  and adjusted R-squared: 0.1171. Which is very steep. This seems to indicate that adding studio to our model, might actually reduce the overall adjusted-R squared of our model. And it also seems to show that studio is not necessarily a good predictor variable.</span> 
+
+
+### <span style="color: Brown">**Result: **</span> 
+
+- We see a high degree of variance between the studios with respect to the IMDB_ratings.  So it looks like studios might have a strong influence in the imdb_ratings.  
+
+- We need to keep this in mind when we build our model.
+
+
+~~I am interested if the title of a movie, has any influence on audience, affecting the imdb_rating of a movie.~~  
+
+- imdb_url and rt_url, offer no real value, as they merely are locations in the internet of where information about the movies is found.
+
+
+### <span style="color: Orange">**Step5 : **</span>  
+
+#### <span style="color: darkgreen">**Influence on lead actor on IMDB_ratings:** </span>
+
+- Another factor of interest, is to see if actors have any influence on movie quality thereby influencing the IMDB_rating
+
+
+- Lead actors can sometimes have a major influence on ratings of movies. I will be exploring the relationship between the **actor1** variable and the **IMDB_ratings** next. 
+
+```{r, fig.width = 24, fig.height= 24, message=FALSE, warning=FALSE, cache=TRUE}
+m5 <- movies%>%select(c(imdb_rating,actor1))
+ggplot(data = m5,aes(x = actor1, y = imdb_rating))+geom_boxplot()+coord_flip()
+
+```
+
+Let us do a more formal check with an ANOVA analysis as well as fit to a linear model just to make sure. Before we get the R squared value.
+```{r}
+AnoV <- aov(imdb_rating~actor1, data = m5)
+summary(AnoV)
+
+lm5 <- lm(imdb_rating~actor1, data = m5)
+summary(lm5)$r.squared
+summary(lm5)$adj.r.squared
+```
+
+
+- the boxplot presents lots of interesting information on lead actors and their movies. 
+
+- It says quite a bit about what kind of movies that the actors seem to fall into. for example: **Adam Sandler** although famous seems to be starring in movies with really low IMDB ratings.  **Arnold Schwazneggar** seems to star in movies with overall higher median IMDB rating.
+
+- Although we see variance, can it be completely attributed to just the actor or to other factors such as the director.
+
+- Nevertheless, this is an interestng variable to consider too.
+
+- <span style="color: red"> **NOTE** One really interesting trend is the difference between R-squared of: 0.8342  and adjusted R-squared: 0.3452.  From this we see that adding in more actors into the predictors actually results in a higher penality. So from this it looks like, actor1 is not necessarily a good predictor variable</span>
 
 * * *
 
 ## Part 4: Modeling
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+- We will now begin creating the model by using the forward selection R-squared approach.  
+
+- We will add one predictor variable at a time, and check if the R-squared value increases or decreases.  Predictor variables that lower R-squared will be dropped.
+
+- Our strategy for adding the predictor variables will follow this strategy:-
+
+- First we will be adding the numeric predictor variables, we will add predictors that result in increased adjustd R-squared. We will then run tests on them to make sure that they satisfy the conditions needed to be added in a MLR model. If they fail to satisfy the conditions, we will remove them from the model.
+
+- We will follow the same approach and add in the categorical variables.
+
+#### <span style="color: red">  Let us list out their R-squared and Adjusted R-square values: </span>
+
+```{r, include=FALSE}
+predictorVariable <- NULL
+rsquared <- NULL
+adjrsquared <- NULL
+variableType <- NULL
+
+lm2_1 <- lm(imdb_rating~runtime, data = m1)
+predictorVariable <-append(predictorVariable,"runtime",after = length(predictorVariable))
+variableType <- append(variableType,"Numeric",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+
+lm2_1 <- lm(imdb_rating~audience_score, data = m1)
+predictorVariable <-append(predictorVariable,"audience_score",after = length(predictorVariable))
+variableType <- append(variableType,"Numeric",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+lm2_1 <- lm(imdb_rating~critics_score, data = m1)
+predictorVariable <-append(predictorVariable,"critics_score",after = length(predictorVariable))
+variableType <- append(variableType,"Numeric",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+lm2_1 <- lm(imdb_rating~imdb_num_votes, data = m1)
+predictorVariable <-append(predictorVariable,"imdb_num_votes",after = length(predictorVariable))
+variableType <- append(variableType,"Numeric",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~title_type, data = m2)
+predictorVariable <-append(predictorVariable,"title_type",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~genre, data = m2)
+predictorVariable <-append(predictorVariable,"genre",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~mpaa_rating, data = m2)
+predictorVariable <-append(predictorVariable,"mpaa_rating",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~critics_rating, data = m2)
+predictorVariable <-append(predictorVariable,"critics_rating",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~audience_rating, data = m2)
+predictorVariable <-append(predictorVariable,"audience_rating",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~best_pic_nom, data = m2)
+predictorVariable <-append(predictorVariable,"best_pic_nom",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~best_pic_win, data = m2)
+predictorVariable <-append(predictorVariable,"best_pic_win",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~best_actor_win, data = m2)
+predictorVariable <-append(predictorVariable,"best_actor_win",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~best_actress_win, data = m2)
+predictorVariable <-append(predictorVariable,"best_actress_win",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~best_dir_win, data = m2)
+predictorVariable <-append(predictorVariable,"best_dir_win",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+
+lm2_1 <- lm(imdb_rating~top200_box, data = m2)
+predictorVariable <-append(predictorVariable,"top200_box",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+lm2_1 <- lm(imdb_rating~studio, data = m3)
+predictorVariable <-append(predictorVariable,"studio",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+lm2_1 <- lm(imdb_rating~actor1, data = m5)
+predictorVariable <-append(predictorVariable,"actor1",after = length(predictorVariable))
+variableType <- append(variableType,"Categorical",after = length(variableType))
+rsquared <- append(rsquared,summary(lm2_1)$r.squared,after = length(rsquared))
+adjrsquared <- append(adjrsquared,summary(lm2_1)$adj.r.squared,after = length(adjrsquared))
+
+RsquaredSummary <- data.frame( predictorVariable = predictorVariable,VariableType = variableType ,rsquared = rsquared, adjrsquared = adjrsquared)
+RsquaredSummary <- RsquaredSummary%>%group_by(VariableType)%>%arrange(desc(adjrsquared), .by_group = TRUE)
+
+```
+
+
+```{r}
+kable(RsquaredSummary)
+```
+
+#### <span style="color: darkgreen">**Section 1: Build model with numeric variables** </span>  
+
+- We will be considering the following numeric_variables, since they have the largest correleation coefficients: **audience_score,   critics_score,   imdb_num_votes,   runtime**  
+
+```{r}
+
+model <- lm(imdb_rating~audience_score+critics_score, data = movies)
+
+summary(model)$r.squared
+summary(model)$adj.r.squared
+
+# p1 <- ggplot(data = model, aes(x = audience_score, y = .resid))+geom_point()+geom_hline(yintercept=0, linetype="dashed", color = "red")
+# 
+# 
+# p2 <- ggplot(data = model, aes(x = .resid)) + geom_histogram() + xlab("Residuals")
+# #QQ-plot
+# p2_1 <- ggplot(data = model, aes(sample = .resid)) + stat_qq()+stat_qq_line(size=1.25, color="red")
+# 
+# p3 <- ggplot(data = model, aes(x = .fitted, y = .resid))+geom_point()+geom_hline(yintercept=0, linetype="dashed", color = "red")
+# p3_1 <- ggplot(data = model, aes(x = abs(.fitted), y = .resid))+geom_point()+geom_hline(yintercept=0, linetype="dashed", color = "red")
+# 
+# 
+# print(p1)
+# print(p2)
+# print(p2_1)
+# print(p3)
+# print(p3_1)
+
+
+#hist(model$residuals)
+#qqnorm(model$residuals)
+#qqline(model$residuals)
+#plot(model$residuals~model$fitted)+abline(h = 0)
+#plot(abs(model$residuals)~model$fitted)+abline(h = 0)
+#plot(model$residuals)+abline(h = 0)
+#modelSummary <- data.frame( modelPredVar = modelPredVar,modelRsquare = modelRsquare ,modeladjRsquare = modeladjRsquare)
+
+summary(model)
+```
+
+#### <span style="color: red">**Let us plot all the numeric variables to check for costant variability vs residuals** </span> 
+
+```{r}
+plot(model$residuals~movies$audience_score)+abline(h = 0)
+plot(model$residuals~movies$critics_score)+abline(h = 0)
+plot(model$residuals~movies$imdb_num_votes)+abline(h = 0)
+plot(model$residuals~movies$runtime)+abline(h = 0)
+```
+
+- **audience_score** is constatnly variable , so we keep it.
+
+- **critics_score** is constantly variable so we keep it.
+
+- **imdb_num_votes** is not constantly variable so we drop it.
+
+- **runtime** is not constantly variable so we drop it.
+
+```{r}
+model <- lm(imdb_rating~audience_score, data = movies)
+
+```
+
+After adding: **audience_score**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+```{r}
+model <- lm(imdb_rating~audience_score+critics_score, data = movies)
+```
+After adding: **critics_score**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+**The adjusted R-squared has increased, so critics score is a useful predictor variable, along with audience_score**
+
+#### <span style="color: red">**Let us begin adding in the categorical variables now** </span> 
+
+#### <span style="color: red">**audience_rating** </span>
+```{r, fig.width = 48, fig.height = 48}
+model <- lm(imdb_rating~audience_score+critics_score+audience_rating, data = movies)
+par(mfrow=c(2,2))
+hist(model$residuals)
+qqnorm(model$residuals)
+qqline(model$residuals)
+plot(model$residuals~model$fitted)+abline(h = 0)
+plot(abs(model$residuals)~model$fitted)+abline(h = 0)
+plot(model$residuals)+abline(h = 0)
+dev.off()
+```
+
+- <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
+
+After adding: **audience_rating**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+**The adjusted- R squared increased so we keep this predictor**
+
+
+#### <span style="color: red">**critics_rating** </span>
+```{r, fig.width = 48, fig.height = 48}
+model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating, data = movies)
+par(mfrow=c(2,2))
+hist(model$residuals)
+qqnorm(model$residuals)
+qqline(model$residuals)
+plot(model$residuals~model$fitted)+abline(h = 0)
+plot(abs(model$residuals)~model$fitted)+abline(h = 0)
+plot(model$residuals)+abline(h = 0)
+dev.off()
+```
+
+- <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
+
+After adding: **critics_rating**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+**The adjusted- R squared increased so we keep this predictor**
+
+
+#### <span style="color: red">**genre** </span>
+```{r, fig.width = 48, fig.height = 48}
+model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating+genre, data = movies)
+par(mfrow=c(2,2))
+hist(model$residuals)
+qqnorm(model$residuals)
+qqline(model$residuals)
+plot(model$residuals~model$fitted)+abline(h = 0)
+plot(abs(model$residuals)~model$fitted)+abline(h = 0)
+plot(model$residuals)+abline(h = 0)
+dev.off()
+```
+
+
+- <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
+
+After adding: **genre**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+**The adjusted- R squared increased so we keep this predictor**
+
+
+
+#### <span style="color: red">**best_pic_win** </span>
+```{r, fig.width = 48, fig.height = 48}
+model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating+genre+best_pic_win, data = movies)
+par(mfrow=c(2,2))
+hist(model$residuals)
+qqnorm(model$residuals)
+qqline(model$residuals)
+plot(model$residuals~model$fitted)+abline(h = 0)
+plot(abs(model$residuals)~model$fitted)+abline(h = 0)
+plot(model$residuals)+abline(h = 0)
+dev.off()
+```
+
+- <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
+
+After adding: **best_pic_win**  
+
+the R-squared: `r summary(model)$r.squared` 
+
+the adjusted R-squared: `r summary(model)$adj.r.squared`
+
+**The adjusted- R squared increased so we keep this predictor**
+
+
+
+- The remaining categorical variables were ignored as they caused a decrease in adjuster - r squared.
+
+- Also studio and actor1 are not really categorical variables, as they do not have categories , but just a whole bunch of actor and studio names.
+
+- There fore in our model they are not used. 
 
 * * *
 
 ## Part 5: Prediction
 
-NOTE: Insert code chunks as needed by clicking on the "Insert a new code chunk" 
-button above. Make sure that your code is visible in the project you submit. 
-Delete this note when before you submit your work.
+#### <span style="color: red">  Wonder Woman(2017)  </span>
+```{r}
+#Wonder Woman rating
+newprof <- data.frame(audience_score = 87 ,critics_score = 93 ,audience_rating = "Upright" ,critics_rating = "Certified Fresh",genre = "Action & Adventure",best_pic_win = "no")
+p1 <- predict(model, newprof, interval = "prediction", level = 0.95)
+kable(p1)
+```
+
+<span style="color: red"> predicted value: </span> `r p1[1]` 
+
+<span style="color: red"> original IMDB rating: </span> [7.4](https://www.imdb.com/title/tt0451279/) 
+
+<span style="color: red"> prediction off by(percentage): </span>  `r ((p1[1]-7.4)/10)*100` 
+
+<span style="color: darkgreen"> ORIGINAL IMDB VALUE falls inside PREDICTED Confidence interval of 95% </span> 
+
+
+#### <span style="color: red">  Star Wars: The Last Jedi (2018)  </span>
+
+```{r}
+#SW The Last Jedi
+newprof <- data.frame(audience_score = 43 ,critics_score = 91 ,audience_rating = "Spilled" ,critics_rating = "Certified Fresh",genre = "Action & Adventure",best_pic_win = "no")
+predict(model, newprof, interval = "prediction", level = 0.95)
+p1 <- predict(model, newprof, interval = "prediction", level = 0.95)
+kable(p1)
+```
+
+<span style="color: red"> predicted value: </span> `r p1[1]` 
+
+<span style="color: red"> original IMDB rating: </span> [7.0](https://www.imdb.com/title/tt2527336/) 
+
+<span style="color: red"> prediction off by(percentage): </span>  `r ((p1[1]-7)/10)*100` 
+
+<span style="color: darkgreen"> ORIGINAL IMDB VALUE falls inside PREDICTED Confidence interval of 95% </span> 
+
+
+
+#### <span style="color: red">  Star Wars: The Rise of Skywalker (2019)  </span>
+
+```{r}
+#SW The rise of skywalker
+newprof <- data.frame(audience_score = 86 ,critics_score = 52 ,audience_rating = "Upright" ,critics_rating = "Rotten",genre = "Action & Adventure",best_pic_win = "no")
+predict(model, newprof, interval = "prediction", level = 0.95)
+p1 <- predict(model, newprof, interval = "prediction", level = 0.95)
+kable(p1)
+```
+
+<span style="color: red"> predicted value: </span> `r p1[1]` 
+
+<span style="color: red"> original IMDB rating: </span> [6.7](https://www.imdb.com/title/tt2527338/) 
+
+<span style="color: red"> prediction off by(percentage): </span>  `r ((p1[1]-6.7)/10)*100` 
+
+<span style="color: darkgreen"> ORIGINAL IMDB VALUE falls inside PREDICTED Confidence interval of 95% </span> 
+
+
+#### <span style="color: red">  James Bond 007: Casino Royale 007  </span>
+
+```{r}
+#James Bond 007: Casino Royale 007
+newprof <- data.frame(audience_score = 89 ,critics_score = 95 ,audience_rating = "Upright" ,critics_rating = "Certified Fresh",genre = "Action & Adventure",best_pic_win = "no")
+predict(model, newprof, interval = "prediction", level = 0.95)
+p1 <- predict(model, newprof, interval = "prediction", level = 0.95)
+kable(p1)
+```
+
+
+<span style="color: red"> predicted value: </span> `r p1[1]` 
+
+<span style="color: red"> original IMDB rating: </span> [8](https://www.imdb.com/title/tt0381061/) 
+
+<span style="color: red"> prediction off by(percentage): </span>  `r ((p1[1]-8)/10)*100` 
+
+<span style="color: darkgreen"> ORIGINAL IMDB VALUE falls inside PREDICTED Confidence interval of 95% </span>   
 
 * * *
 
 ## Part 6: Conclusion
 
+- Our model is **really accurate in the 95% confidence interval** . It is able to predicted IMDB rating values accurately such that they fall into this confidence interval.
+
+- The mean loss of precision of our model is: **`r (abs(((p1[1]-8)/10)*100)+abs(((p1[1]-6.7)/10)*100)+abs(((p1[1]-7)/10)*100)+abs(((p1[1]-7.4)/10)*100))/4`**
+
+- Our model is **well designed** as it takes into account, diveregence of opinion between Critics and Audiences.`
+
+- This is a robust well designed model.
