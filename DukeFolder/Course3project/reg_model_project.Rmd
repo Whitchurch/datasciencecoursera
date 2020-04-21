@@ -682,16 +682,14 @@ the adjusted R-squared: `r summary(model)$adj.r.squared`
 #### <span style="color: darkgreen">**Section 2: Build model with categorical variables** </span> 
 
 #### <span style="color: red">**audience_rating** </span>
-```{r, fig.width = 48, fig.height = 48}
+```{r}
 model <- lm(imdb_rating~audience_score+critics_score+audience_rating, data = movies)
-par(mfrow=c(2,2))
-hist(model$residuals)
+hist(model$residuals, main = "Normally distrbuted Residuals")
 qqnorm(model$residuals)
 qqline(model$residuals)
-plot(model$residuals~model$fitted)+abline(h = 0)
-plot(abs(model$residuals)~model$fitted)+abline(h = 0)
-plot(model$residuals)+abline(h = 0)
-dev.off()
+plot(model$residuals~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(abs(model$residuals)~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(model$residuals,main = "Check for time-dependent variations")+abline(h = 0)
 ```
 
 - <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
@@ -706,16 +704,14 @@ the adjusted R-squared: `r summary(model)$adj.r.squared`
 
 
 #### <span style="color: red">**critics_rating** </span>
-```{r, fig.width = 48, fig.height = 48}
+```{r}
 model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating, data = movies)
-par(mfrow=c(2,2))
-hist(model$residuals)
+hist(model$residuals, main = "Normally distrbuted Residuals")
 qqnorm(model$residuals)
 qqline(model$residuals)
-plot(model$residuals~model$fitted)+abline(h = 0)
-plot(abs(model$residuals)~model$fitted)+abline(h = 0)
-plot(model$residuals)+abline(h = 0)
-dev.off()
+plot(model$residuals~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(abs(model$residuals)~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(model$residuals,main = "Check for time-dependent variations")+abline(h = 0)
 ```
 
 - <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
@@ -730,16 +726,14 @@ the adjusted R-squared: `r summary(model)$adj.r.squared`
 
 
 #### <span style="color: red">**genre** </span>
-```{r, fig.width = 48, fig.height = 48}
+```{r}
 model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating+genre, data = movies)
-par(mfrow=c(2,2))
-hist(model$residuals)
+hist(model$residuals, main = "Normally distrbuted Residuals")
 qqnorm(model$residuals)
 qqline(model$residuals)
-plot(model$residuals~model$fitted)+abline(h = 0)
-plot(abs(model$residuals)~model$fitted)+abline(h = 0)
-plot(model$residuals)+abline(h = 0)
-dev.off()
+plot(model$residuals~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(abs(model$residuals)~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(model$residuals,main = "Check for time-dependent variations")+abline(h = 0)
 ```
 
 
@@ -756,16 +750,14 @@ the adjusted R-squared: `r summary(model)$adj.r.squared`
 
 
 #### <span style="color: red">**best_pic_win** </span>
-```{r, fig.width = 48, fig.height = 48}
+```{r}
 model <- lm(imdb_rating~audience_score+critics_score+audience_rating+critics_rating+genre+best_pic_win, data = movies)
-par(mfrow=c(2,2))
-hist(model$residuals)
+hist(model$residuals, main = "Normally distrbuted Residuals")
 qqnorm(model$residuals)
 qqline(model$residuals)
-plot(model$residuals~model$fitted)+abline(h = 0)
-plot(abs(model$residuals)~model$fitted)+abline(h = 0)
-plot(model$residuals)+abline(h = 0)
-dev.off()
+plot(model$residuals~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(abs(model$residuals)~model$fitted,main = "Residual vs fitted")+abline(h = 0)
+plot(model$residuals,main = "Check for time-dependent variations")+abline(h = 0)
 ```
 
 - <span style="color: darkgreen">From the plots: audience_rating shows: Constant variability.  Nearly Normal residuals.</span>
