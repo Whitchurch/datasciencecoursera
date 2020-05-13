@@ -31,8 +31,8 @@ df <- numerator/denominator
 
 
 theta <- seq(from = 0, to = 1, by = 0.01)
-likelihood1 <- dbinom(0,1,prob = theta)
-prior <- dbeta(theta,6,1)
+likelihood1 <- dbinom(1,1,prob = theta)
+prior <- dbeta(theta,3,1)
 denominator1 <- sum(likelihood1*prior)/100
 
 
