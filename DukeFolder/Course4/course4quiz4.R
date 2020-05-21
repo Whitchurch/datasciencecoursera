@@ -120,17 +120,17 @@ outliers_df %>%
   filter(probability > 0.50)
 
 #Check for outliers above 3 stadnard deviation
-(prob_outlier <- pnorm(-3) + pnorm(3, lower.tail = FALSE))
+(prob_outlier <- pnorm(-4) + pnorm(4, lower.tail = FALSE))
 (prob_not_outlier <- 1 - prob_outlier)
 
 #Probability of no outliers. for a sample of size n.
 n <- nrow(wage)
-(prob_no_outliers <- prob_not_outlier^n)
+(prob_no_outliers <- prob_not_outlier^1000)
 1 - prob_no_outliers
 
 #instead of settink K, set prior probability and then sove for K. DO the reverese of whatever was done.
 n <- nrow(wage)
-(prob_obs_not_outlier <- 0.9202^(1/n))
+(prob_obs_not_outlier <- 0.95^(1/1000))
 
 (newk <- qnorm(0.5 + 0.5 * prob_obs_not_outlier))
 
