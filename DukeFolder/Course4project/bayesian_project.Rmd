@@ -1,0 +1,667 @@
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(ggplot2)
+library(dplyr)
+library(statsr)
+library(BAS)
+library(knitr)
+library(GGally)
+```
+
+### Load data
+
+Make sure your data and R Markdown files are in the same directory. When loaded
+your data file will be called `movies`. Delete this note when before you submit 
+your work. 
+
+```{r load-data}
+load("movies.Rdata")
+```
+
+
+
+* * *
+
+## Part 1: Data  
+
+### <span style="color: brown">What is this data about?  </span>  
+
+- The dataset contains a list of randomly sampled movies from the IMDB and Rotten Tomatoe movie databases.  
+
+- It contains information about both audience and critic scores about how much they like/dislike movies. As well as other variables associated with the movie.  
+
+- The dataset contains 651 rows and 32 variables.  
+
+- The codebook can be viewed from this link: [Code Book](https://d18ky98rnyall9.cloudfront.net/_73393031e98b997cf2445132f89606a1_movies_codebook.html?Expires=1586908800&Signature=IZy8756SrMG5MDxovj4cf9XfLTeDQzOuNK250lyE~TgJ1sfjmrUJ17K2jc3MdX~NsFgNJogFeS4K-7iKNRlFmQzdT~zaW1NplyDa9vc8uUCvBtq1RXHKparTVJxQPfAItI0ol4WCvW-wNE1qiuT37XJ6~5ZYqd75nJEvoZMtsnI_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A)
+
+#### <span style="color: red">Sampling: </span> 
+
+- **Random Sampling** was used in the selection of the movies from the IMDB and Rotten Tomatoe databases.
+
+#### <span style="color: red">Generalizability and Association vs Causation</span>
+
+<span style="color: Green">**Generalizability** :</span>
+
+- The survey uses data from the Rotten Tomatoes and IMDB databases.
+
+- These are some of the biggest databases in the world, that has data on a huge repository of movies from around the world.
+
+- However, on closer inspection. The data about the movies in the sample contain only English language movies.  
+
+### <span style="color: Orange">**Answer : **</span>
+- So we can safely say that the sample data is generalizable **only** to English language movies from the IMDB and Rotten Tomato database.  
+
+<span style="color: Green">**Causality** :</span>
+
+- The data is **Associative** at the moment.
+
+- However, controlled random assignment of new movies to any model generated, can be used to establish **causal** relationships between **response** and **explanatory** variables.
+
+### <span style="color: Orange">**Answer : **</span>
+
+- The data is **Associative** at the moment.  
+
+- **However** ,there is a possibilty of drawing conclusions on **causality** only after conducting many simulations on generated models to figure out there is strong evidence of **causality** between the **response** and **explanatory** variables used to create the model.
+
+* * *
+
+## Part 2: Data manipulation  
+#### <span style="color: Green">
+- Create new variable based on `title_type`: New variable should be called 
+`feature_film` with levels yes (movies that are feature films) and no  </span> 
+
+First let us have a look at the `title_type` data in tabular form: There are  **591** feature films
+```{r}
+kable(table(movies$title_type),format = "pandoc")
+```
+
+Let us create a new column: `feature_film`, this will have **2 levels: "Yes" - for feature films, "No"- for the rest**. We will still have **591** feature films in this new column:
+
+```{r}
+movies <- movies%>%mutate(feature_film = ifelse(title_type == "Feature Film","Yes","No"))%>%mutate(feature_film = as.factor(feature_film))
+kable(table(movies$feature_film),format = "pandoc")
+```
+  
+* * *   
+#### <span style="color: Green">
+- Create new variable based on `genre`: New variable should be called `drama`
+with levels yes (movies that are dramas) and no </span>   
+
+First let us have a look at the `genre` data in tabular form: There are  **305** Dramas films
+```{r}
+kable(table(movies$genre),format = "pandoc")
+```
+
+Let us create a new column: `Drama`, this will have **2 levels:** **"Yes" - for Drama, "No"- for the rest**. We will still have **305** Drama in this new column:
+
+```{r}
+movies <- movies%>%mutate(drama = ifelse(genre == "Drama","Yes","No"))%>%mutate(drama = as.factor(drama))
+kable(table(movies$drama),format = "pandoc")
+```
+  
+* * *
+
+
+#### <span style="color: Green">
+- Create new variable based on `mpaa_rating`: New variable should be called `mpaa_rating_R` with levels yes (movies that are R rated) and no</span>  
+
+First let us have a look at the `mpaa_rating` data in tabular form: There are  **329** R- rated films
+```{r}
+kable(table(movies$mpaa_rating),format = "pandoc")
+```
+
+Let us create a new column: `mpaa_rating_R`, this will have **2 levels:** **"Yes" - for R, "No"- for the rest**. We will still have **329** R in this new column:
+
+```{r}
+movies <- movies%>%mutate(mpaa_rating_R = ifelse(mpaa_rating == "R","Yes","No"))%>%mutate(mpaa_rating_R = as.factor(mpaa_rating_R))
+kable(table(movies$mpaa_rating_R),format = "pandoc")
+```
+  
+* * *
+#### <span style="color: Green">
+- Create two new variables based on `thtr_rel_month`: 
+    + New variable called `oscar_season` with levels yes (if movie is released 
+    in November, October, or December) and no
+    + New variable called `summer_season` with levels yes (if movie is released 
+    in May, June, July, or August) and no </span>
+    
+    
+- Create new variable based on `thtr_rel_month`: New variable should be called `oscar_season` with levels yes (if movie is released 
+    in November, October, or December) and no
+
+There are **191** movies from **Oct, Nov, Dec**     
+    
+```{r}
+kable(table(month.abb[movies$thtr_rel_month]),format = "pandoc")
+```
+    
+Let us create a new column: `oscar_season`, this will have **2 levels: "Yes" - (if movie is released in November, October, or December) , "No"- for the rest**  We will still have **191** Oscar movies in this new column:    
+
+```{r}
+movies <- movies%>%mutate(oscar_season = ifelse((month.abb[movies$thtr_rel_month] == "Nov")|(month.abb[movies$thtr_rel_month] == "Oct")|(month.abb[movies$thtr_rel_month] == "Dec"),"Yes","No"))%>%mutate(oscar_season = as.factor(oscar_season))
+
+kable(table(movies$oscar_season),format = "pandoc")
+```
+
+- Create new variable based on `thtr_rel_month`: New variable should be called `summer_season` with levels yes (if movie is released
+    in May, June, July, or August) and no
+    
+There are **208** movies from **May, June, July, August**     
+    
+```{r}
+kable(table(month.abb[movies$thtr_rel_month]),format = "pandoc")
+```
+    
+Let us create a new column: `summer_season`, this will have **2 levels: "Yes" - (if movie is released in November, October, or December) , "No"- for the rest**  We will still have **208** summer movies in this new column:    
+
+```{r}
+movies <- movies%>%mutate(summer_season = ifelse((month.abb[movies$thtr_rel_month] == "May")|(month.abb[movies$thtr_rel_month] == "Jun")|(month.abb[movies$thtr_rel_month] == "Jul")|(month.abb[movies$thtr_rel_month] == "Aug"),"Yes","No"))%>%mutate(summer_season = as.factor(summer_season))
+
+kable(table(movies$summer_season),format = "pandoc")
+```
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+- Let us do some EDA using our 3 newly created variables. 
+
+- We will see how each variable affects the audience score.
+
+
+```{r message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+
+m1 <- movies%>%select(c(audience_score,feature_film,drama,mpaa_rating_R,oscar_season,summer_season))
+ggpairs(data = m1)
+
+```
+
+There seem to be a trend between the newly created variables and the audience_score.  This is evident from the different medians in the boxplots. This seems to suggest dependence.
+
+Let us plot each boxplot of audience_score vs the 4 variables to see the boxplots clearly.
+
+#### <span style="color: Green"> Audience Score vs Feature films
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = movies, aes(x = feature_film, y = audience_score))+geom_boxplot()
+```
+
+<span style="color: Orange"> Summary Table </span>
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+kable(movies%>%select(audience_score,feature_film)%>%group_by(feature_film)%>%summarise(meanScore = mean(audience_score), medianScore = median(audience_score), maxScore = max(audience_score), minScore = min(audience_score),quantile25 = quantile(audience_score)[[2]], quantile75 = quantile(audience_score)[[4]]),format = "pandoc")
+```
+
+<span style="color: Orange"> Narrative on Data </span>
+
+- It can be seen that , **feature films have an overall lower median for ratings**, compared to other films. 
+
+- This shows, that this variable feature_films can contribute valuable information to help predict audience_score.
+
+- Non-feature films seem to exhibit a particulrly high audience score at both ends of the distribution. This is interesting data, that will surely make a huge difference in our predictor model.
+
+- This **high variability** in medians, indicated a **strong dependence** between **audience_score and feature_film** variable
+
+
+#### <span style="color: Green"> Audience Score vs Drama
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data = movies, aes(x = drama, y = audience_score))+geom_boxplot()
+```
+
+<span style="color: Orange"> Summary Table </span>
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+kable(movies%>%select(audience_score,drama)%>%group_by(drama)%>%summarise(meanScore = mean(audience_score), medianScore = median(audience_score), maxScore = max(audience_score), minScore = min(audience_score), quantile25 = quantile(audience_score)[[2]], quantile75 = quantile(audience_score)[[4]]),format = "pandoc")
+```
+
+<span style="color: Orange"> Narrative on Data </span>
+
+- It can be seen that **Drama films have overall higher median audience score**, compared to Non-Drama.
+
+- This **high variability** in medians, indicated a **strong dependence** between **audience_score and Drama** variable
+
+- Dramas seem to have an overall higher audience scale, across both the max and min ratings in the distribution.
+
+- Hence it is a good idea to include this variable in the modelling stage.
+
+#### <span style="color: Green"> Audience Score vs MPAA_RATING_R
+
+```{r message=FALSE, warning=FALSE,echo=FALSE}
+ggplot(data = movies, aes(x = mpaa_rating_R, y = audience_score))+geom_boxplot()
+```
+
+<span style="color: Orange"> Summary Table </span>
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+kable(movies%>%select(audience_score,mpaa_rating_R)%>%group_by(mpaa_rating_R)%>%summarise(meanScore = mean(audience_score), medianScore = median(audience_score), maxScore = max(audience_score), minScore = min(audience_score),quantile25 = quantile(audience_score)[[2]], quantile75 = quantile(audience_score)[[4]]),format = "pandoc")
+```
+
+<span style="color: Orange"> Narrative on Data </span>
+
+- There seems to be low/slight variability in median between MPAA_rating R vs Non-R.
+
+- We will keep this variable in consideration, and run it over the BMA and BIC, to see how it's posterior inclusion probability (PIP), performs before deciding on keeping it or rejecting it.
+
+#### <span style="color: Green"> Audience Score vs Oscar Season ;  Audience Score vs Summer Season
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+g1 <- ggplot(data = movies, aes(x = oscar_season, y = audience_score))+geom_boxplot()
+
+g2 <- ggplot(data = movies, aes(x = summer_season, y = audience_score))+geom_boxplot()
+
+gridExtra::grid.arrange(g1,g2,ncol = 2 )
+
+
+```
+
+<span style="color: Orange"> Summary Table </span>
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+kable(movies%>%select(audience_score,oscar_season)%>%group_by(oscar_season)%>%summarise(meanScore = mean(audience_score), medianScore = median(audience_score), maxScore = max(audience_score), minScore = min(audience_score),quantile25 = quantile(audience_score)[[2]], quantile75 = quantile(audience_score)[[4]]),format = "pandoc")
+
+kable(movies%>%select(audience_score,summer_season)%>%group_by(summer_season)%>%summarise(meanScore = mean(audience_score), medianScore = median(audience_score), maxScore = max(audience_score), minScore = min(audience_score),quantile25 = quantile(audience_score)[[2]], quantile75 = quantile(audience_score)[[4]]),format = "pandoc")
+
+```
+
+<span style="color: Orange"> Narrative on Data </span>
+
+- There seems to be a **no deprendence** between **oscar_season and audience score**: As evidenced by variation between the medians in the plot.
+
+- There seems to be low to **no dependence** between **summer_season and audience score**: As evidenced by low variability in the box plot.
+
+- However, we will keep **summer_season and oscar_season** and run the BMA and BIC to see , if the model, drops this. Which it should probabiliy do based on **BIC** that creates a parsimonious model.
+
+<span style="color: Red">Final Thoughts:</span>
+
+- **In summary it seems like only 2 of our newly created variables: Feature_Film, Drama seem to affect audience score.**  
+
+- **The rest seem to have neglible effect on the audience score.**
+
+- **Let us check if our hunch is right by creating a BIC model.**
+
+
+* * *
+
+## Part 4: Modeling
+
+#### <span style="color: Green"> Step 1: Calculate BIC score of full model
+```{r cache=TRUE}
+m_audiencescore_full <- lm(audience_score ~ ., data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+The BIC score for the full model with all variables is `r BIC(m_audiencescore_full)`
+
+#### <span style="color: Green"> Step 2: Clean up model
+
+Our full model has 37 variables, this will lead to approximatels 137 Billion models. 
+`r (2^37)/(10^9)` billion models.
+
+Let us remove some obvious variable to get a smaller feature set:
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+- Removing **title** has lowered the BIC score, which is a good sign.
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+- There is no difference in the BIC score, after removing **imdb_url, rt_url , actor2 - actor5**.
+- This shows that we can remove these variables as they do not contribute anything for or against explaining the variability of the audience_score
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+- There is a huge increase in BIC  after removing **actor1**, this might be an important variable.
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+Let us keep that variable in for the time being.
+
+Let us remove more variables to see what happens to the BIC score:
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+- We see a good decrease in BIC
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-feature_film, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+- Removing feature film has not affected the BIC score. This means it has neglible influence on the model. This can be explained by the fact that whatever is in genre, is redundant in feature_film.
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-feature_film-drama-mpaa_rating_R-oscar_season-summer_season, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+- Removing all of the variables we created before, shows that they have not affected the BIC score in anyway. This means that they are redundant and need not be used during our modelling.
+
+- We now have `r 2^(37-13)` million models. We still need to reduce the number of variables to a more reasonable number.
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-feature_film-drama-mpaa_rating_R-oscar_season-summer_season-thtr_rel_year-thtr_rel_month-thtr_rel_day, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+- we have a decrease further in BIC, this is a good sign.
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-feature_film-drama-mpaa_rating_R-oscar_season-summer_season-thtr_rel_year-thtr_rel_month-thtr_rel_day-dvd_rel_year-dvd_rel_month-dvd_rel_day, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+
+```{r}
+m_audiencescore_full <- lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-feature_film-drama-mpaa_rating_R-oscar_season-summer_season-thtr_rel_year-thtr_rel_month-thtr_rel_day-dvd_rel_year-dvd_rel_month-dvd_rel_day-director-actor1-studio, data = na.omit(movies))
+BIC(m_audiencescore_full)
+```
+We finally remove **studio,director,actor1**. This was done because the presence of these variable was resulting in a memory overflow of the BMA model being generated. 
+
+However, further research done, showed these variables were not that important for determining the audience score in the models that were generated in the subsequent steps.
+
+#### <span style="color: Green"> Step 3: Let do a BMA model
+
+I now create a subset of the dataframe, only containing the variables that will be considered for generating the BMA model:
+
+- runtime
+- imdb_rating
+- imdb_num_votes
+- critics_score
+- audience_rating
+- best_pic_nom
+- best_pic_win
+- best_actor_win
+- best_actress_win
+- best_dir_win
+- feature_film
+- drama
+- mpaa_rating_R
+- oscar_season
+- summer_season
+- audience_score
+
+There will be `r 2^16` models that get generated from these 16 variables.
+
+- I am using a **ZS-null prior** for the coefficients of the predictors.  
+
+- I am also using a uniform prior, that assigns equal probability to all the models before seeing the data. Each model will have an intial probability of `r 1/(2^16)` before seeing the data.
+
+
+```{r}
+# Fit the model using Bayesian linear regression, `bas.lm` function in the `BAS` package
+submovies <- movies%>%dplyr::select(runtime,imdb_rating,imdb_num_votes,critics_score,audience_rating,best_pic_nom,best_pic_win,best_actor_win,best_actress_win,best_dir_win,feature_film,drama, mpaa_rating_R,oscar_season, summer_season,audience_score)
+
+bma_model <- bas.lm(audience_score ~ ., data = na.omit(submovies),
+                    prior = "ZS-null", 
+                    modelprior = uniform())
+
+#bma_model <- bas.lm(audience_score ~ . -title-imdb_url-rt_url-actor4-actor5-actor2-actor3-top200_box-thtr_rel_year-thtr_rel_month-thtr_rel_day-dvd_rel_year-dvd_rel_month-dvd_rel_day-director-actor1-studio-genre-mpaa_rating-title_type-critics_rating, data = na.omit(submovies),
+#                    prior = "ZS-null", 
+#                    modelprior = uniform())
+
+```
+
+### <span style="color: Orange">Analysis of the Model generated </span>
+
+#### <span style="color: Green"> summary </span>
+```{r}
+summary(bma_model)
+```
+
+```{r}
+image(bma_model,rotate = F)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- We can see that the posterior probability has now changed, from `r 1/(2^16)` per model, and from the top five best models listed. The best candidate has a probability of **32%**  which is a considerable jump.
+
+- By analyzing the top-5 models we see that, all of them can explain 88% of the variability in the audience score from the R2 row.
+
+- Also the best model uses just **3** predictor variables, with the rest using **4** predictor variables.
+
+- The best model can be identified as having the **BF - Baysean Factor** of 1.
+
+- From the next chart we see that: **imdb_num_votes**, **audience_rating** and **runtime** are the most important variables by order of importance. Based on their appearance across all the models from the second figure.
+
+#### <span style="color: Green"> Analysis of plots </span>
+```{r}
+plot(bma_model,which = 1)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- We observe the random scatter of residuals versus fitted for our BMA model.
+- We see that there is a random scatter, however here seem to be 2 distinct clusters.
+- However both clusters show large amount of data concentrated around the 0 line, which means our model is pretty good in predictions.
+
+```{r}
+plot(bma_model,which = 2)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- We see that the cumulative probability when adding models seems to top of at 30000, this means adding anymore models to the BMA does not improve the model further.
+
+
+
+```{r}
+plot(bma_model,which = 3)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- The plot of **Model Dimension Vs Log(Marginal)**, shows that models with 3 - 4 dimensions have a higher Baysean Likelihood, when compared to the Base Model (with just the intercept)
+
+- This clerly shows that our best models are going to be those with dimensions of 3, or 4.
+
+- Models with more number of dimensions and consequently higher predictive variables seem to be having a negative effect.
+
+
+```{r}
+plot(bma_model,which = 4)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- From the **Probability of Inclusion Plot (PIP)**, it can be clearly seen that **imdb_rating** and **audience_rating** have the highest probability of being included in the model. At almost 100%.
+
+- **runtime** and **MPAA_rating_R** seem to come in the next category, but they have 20% probability of inclusion.
+
+
+### <span style="color: Orange"> Plotting the distribution of the coefficients </span>
+
+```{r fig.width = 12, fig.height= 24}
+coef_model = coefficients(bma_model)
+par(mfrow = c(9,2))
+plot(coef_model)
+
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- The distribution of the coefficients tells a similar story. 
+- Only the imdb_rating and audience_rating have very high probability of inclusion as evidenced by their high peaks.
+
+- The remaining coefficients all have really tall stems, indicating their probability of being not included as really high.
+
+* * *
+
+## Part 5: Prediction
+
+<!-- datatopredict <- data.frame(runtime  = ,imdb_rating = ,imdb_num_votes = ,critics_score = ,audience_rating = ,best_pic_nom = ,best_pic_win = ,best_actor_win = ,best_actress_win = ,best_dir_win = ,feature_film = ,drama = , mpaa_rating_R = ,oscar_season = , summer_season = ) -->
+
+Let us build the different models for prediction:
+
+### <span style="color: Orange"> Model-1 : BMA (Baysean Model Average) </span>
+
+```{r}
+BMA_pred_score <- predict(bma_model, estimator = "BMA", se.fit = TRUE)
+variable.names(BMA_pred_score)
+```
+
+
+<span style="color: Orange"> Narrative: </span>
+
+- The BMA model generated includes all the variables, which is to be expected since it averages over all the models generated to create a comprehensive model. Weighted by their posterior probabilties.
+
+
+### <span style="color: Orange"> Model-2 : BPM (Best Predictive Model) </span>
+
+```{r}
+BPM_pred_score <- predict(bma_model, estimator = "BPM", se.fit = TRUE)
+variable.names(BPM_pred_score)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- The BPM model, uses only the most important variables needed for prediction.
+- It is interesting to see that best_dir is included, even though it's probability of inclusion was quite negligible.
+
+### <span style="color: Orange"> Model-3 : HPM (Highest Probability Model) </span>
+
+```{r}
+HPM_pred_score <- predict(bma_model, estimator = "HPM")
+variable.names(HPM_pred_score)
+```
+
+<span style="color: Orange"> Narrative: </span>
+
+- Highesr probability model only uses the predictors with the highest posterior probability of inclusion.
+
+- Naturally only imdb_rating and audience_rating are included.
+
+
+### <span style="color: Orange"> Model-4 : MPM (Median Probability Model) </span>
+
+```{r}
+MPM_pred_score <- predict(bma_model, estimator = "MPM")
+variable.names(MPM_pred_score)
+```
+
+Let us compare the results from the BMA (Baysean Model Average) and BPM (Best Predictive Model)
+
+- To see how much the predictive precision and accuracy vary.
+- We will make a call on whether the simpler BPM model is as good as the BMA model.
+
+
+#### <span style="color: Orange"> Prediction on Movie: Drive(2011) </span>
+
+- Movie Name: Drive (2011)
+
+- <span style = "color: Red"> **Rotten Tomatoe rating: 79%** </span>
+
+- Input Data & Prediction:
+
+
+<span style="color: Green">BMA result </span>
+
+```{r}
+#bma_model
+datatopredict <- data.frame(runtime  = 100,imdb_rating = 7.8 ,imdb_num_votes = 550981 ,critics_score = 56 ,audience_rating = "Upright",best_pic_nom = "yes" ,best_pic_win = "no" ,best_actor_win = "no" ,best_actress_win = "no" ,best_dir_win = "yes" ,feature_film = "Yes",drama = "Yes", mpaa_rating_R ="Yes" ,oscar_season = "Yes", summer_season = "No" )
+
+
+BPM_pred_score <- predict(bma_model, newdata = datatopredict ,estimator = "BMA", se.fit = TRUE)
+ci_BPM_pred_score <- confint(BPM_pred_score, estimator = "BMA")
+ci_BPM_pred_score
+```
+
+<span style="color: Green">BPM result </span>
+
+```{r}
+#bma_model
+datatopredict <- data.frame(runtime  = 100,imdb_rating = 7.8 ,imdb_num_votes = 550981 ,critics_score = 56 ,audience_rating = "Upright",best_pic_nom = "yes" ,best_pic_win = "no" ,best_actor_win = "no" ,best_actress_win = "no" ,best_dir_win = "yes" ,feature_film = "Yes",drama = "Yes", mpaa_rating_R ="Yes" ,oscar_season = "Yes", summer_season = "No" )
+
+
+BPM_pred_score <- predict(bma_model, newdata = datatopredict ,estimator = "BPM", se.fit = TRUE)
+ci_BPM_pred_score <- confint(BPM_pred_score, estimator = "BPM")
+ci_BPM_pred_score
+```
+
+
+
+#### <span style="color: Orange"> Prediction on Movie: Man of Steel </span>
+
+- Movie Name: Man of Steel
+
+- <span style = "color: Red"> **Rotten Tomatoe rating: 75%** </span>
+
+- Input Data & Prediction:
+
+<span style="color: Green">BMA result </span>
+
+```{r}
+datatopredict <- data.frame(runtime  = 143,imdb_rating = 7.0 ,imdb_num_votes = 672336 ,critics_score = 92 ,audience_rating = "Upright",best_pic_nom = "yes" ,best_pic_win = "no" ,best_actor_win = "no" ,best_actress_win = "no" ,best_dir_win = "no" ,feature_film = "Yes",drama = "No", mpaa_rating_R ="No" ,oscar_season = "No", summer_season = "Yes" )
+
+BPM_pred_score <- predict(bma_model, newdata = datatopredict ,estimator = "BMA", se.fit = TRUE)
+ci_BPM_pred_score <- confint(BPM_pred_score, estimator = "BMA")
+ci_BPM_pred_score
+```
+
+
+<span style="color: Green">BPM result </span>
+
+```{r}
+datatopredict <- data.frame(runtime  = 143,imdb_rating = 7.0 ,imdb_num_votes = 672336 ,critics_score = 92 ,audience_rating = "Upright",best_pic_nom = "yes" ,best_pic_win = "no" ,best_actor_win = "no" ,best_actress_win = "no" ,best_dir_win = "no" ,feature_film = "Yes",drama = "No", mpaa_rating_R ="No" ,oscar_season = "No", summer_season = "Yes" )
+
+BPM_pred_score <- predict(bma_model, newdata = datatopredict ,estimator = "BPM", se.fit = TRUE)
+ci_BPM_pred_score <- confint(BPM_pred_score, estimator = "BPM")
+ci_BPM_pred_score
+```
+
+
+
+* * *
+
+## Part 6: Conclusion
+
+- Firstly we observe from our predictive results there is not much difference between BMA and BPM and both achieve the same predictive values. So the BPM is a more light weight efficient model. We can favor it over BMA.
+
+- Secondly the results for both the movies we considered are given below:
+
+### Man of Steel:  Actual  Rating: **75%.**  Predicted Rating: **76%**
+
+### Confidence Interval Accuracy: 100%
+
+### Precision: 1.3%
+
+* * *
+
+### Drive: Actual  Rating: **79%.**  Predicted Rating: **83%**
+
+### Confidence Interval Accuracy: 100%
+
+### Precision: 4.8%
+
+- Overall, our model is pretty good in determining the Confidence Intervals at 100% accuracy.
+- It also has a decent precision in predicting the actual value, that ranges from 1% to 5%.
+
+Therefore, In conclusion, this is a pretty good parsimonious model, with 2 variables that does a great job at prediction.
+
+
+

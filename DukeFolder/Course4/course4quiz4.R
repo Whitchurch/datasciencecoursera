@@ -234,13 +234,14 @@ ci_lwage[opt,]
 
 exp(ci_lwage[opt,])
 
-BMA_pred_lwage <- predict(bma_lwage, estimator = "BMA", se.fit = TRUE)
+BMA_pred_lwage <- predict(bma_lwage, newdata = wage[1,] , estimator = "BMA", se.fit = TRUE)
+BMA_pred_lwage$fit
 ci_bma_lwage <- confint(BMA_pred_lwage, estimator = "BMA")
 opt_bma <- which.max(BMA_pred_lwage$fit)
 exp(ci_bma_lwage[opt_bma, ])
 
-BPM_pred_lwage <- predict(bma_lwage, estimator = "MPM", se.fit = TRUE)
-ci_bpm_lwage <- confint(BPM_pred_lwage, estimator = "MPM")
+BPM_pred_lwage <- predict(bma_lwage, estimator = "BPM", se.fit = TRUE)
+ci_bpm_lwage <- confint(BPM_pred_lwage, estimator = "BPM")
 opt_bpm <- which.max(BPM_pred_lwage$fit)
 exp(ci_bpm_lwage[opt_bpm, ])
 
