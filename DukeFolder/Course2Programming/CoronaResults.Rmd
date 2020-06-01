@@ -1,5 +1,5 @@
 ---
-title: "Arizona/US/India Corona Trends- 1st July 2020 with tomorrow's prediction"
+title: "Arizona/US/India Corona Trends- 1st June 2020 with tomorrow's prediction"
 author: "Whitchurch Muthumani"
 date: "6/1/2020"
 output: pdf_document
